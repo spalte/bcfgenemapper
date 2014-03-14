@@ -70,8 +70,6 @@ int32_t gene_mapper_map_position(gene_mapper_t* geneMapper, int32_t genomePositi
     int32_t runLength = 0;
     int32_t i;
     
-    printf("exon lengths: ");
-
     for (i = 0; i < geneMapper->exonCount; i++) {
         exon_range_t exon = geneMapper->exons[i];
         char plusExon = exon.end >= exon.start;
@@ -91,10 +89,8 @@ int32_t gene_mapper_map_position(gene_mapper_t* geneMapper, int32_t genomePositi
                 runLength += exonLength;
             }
         }
-        printf("%d ", (int)exonLength);
     }
     
-    printf("\n");
     return -1;
 }
 
@@ -126,6 +122,35 @@ int32_t gene_mapper_reversemap_position(gene_mapper_t* geneMapper, int32_t geneP
     
     return -1;
 }
+
+void gene_mapper_print_exons(gene_mapper_t* geneMapper, FILE *fp)
+{
+    int32_t i;
+
+    fprintf(fp, "There are %d exons in the exon file.\n", (int)geneMapper->exonCount);
+    
+    for (i = 0; i < geneMapper->exonCount; i++) {
+        exon_range_t exon = geneMapper->exons[i];
+        fprintf(fp, "    %8d  %8d ", (int)exon.start, (int)exon.end);
+        if (positive_strand_exon_range(exon)) {
+            fprintf(fp, "  Length: %5d  (+)strand\n", (int)(exon.end - exon.start) + 1);
+        } else {
+            fprintf(fp, "  Length: %5d  (-)strand\n", (int)(exon.start - exon.end) + 1);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

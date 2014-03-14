@@ -153,7 +153,6 @@ int main(int argc, char * const *argv)
     }
     fclose(exonFp);
     exonFp = NULL;
-
     
     if (input_filename == NULL) {
         input_filename = "-";
@@ -168,7 +167,7 @@ int main(int argc, char * const *argv)
         print_usage(stdout, 1);
     }
     
-    char outputFileMode[3] = {'w', 'b', 0};
+    char outputFileMode[3] = {'w', 'v', 0};
     if (output_type) {
         outputFileMode[1] = output_type[0];
     }
@@ -176,6 +175,10 @@ int main(int argc, char * const *argv)
     if (htsInFile < 0) {
         printf("Unable to open output file \"%s\".", output_filename);
         print_usage(stdout, 1);
+    }
+    
+    if (verbose_flag) {
+        gene_mapper_print_exons(geneMapper, stdout);
     }
 
     bcf_hdr_t *bcf_header = bcf_hdr_read(htsInFile);
@@ -189,6 +192,9 @@ int main(int argc, char * const *argv)
 
     bcf_hdr_write(vcfOutFile, hdr_out);
     
+    int32_t keptRecords = 0;
+    int32_t removedRecords = 0;
+    
     bcf1_t *bcf_record = bcf_init();
     while (bcf_read(htsInFile, bcf_header, bcf_record)>=0 )
     {
@@ -197,7 +203,15 @@ int main(int argc, char * const *argv)
             geneLocation++; // we 0 index all locations, but locations in the vcf file are 1 indexed;
             bcf_update_info_int32(hdr_out, bcf_record, "GENEMAP", &geneLocation, 1);
             bcf_write(vcfOutFile, hdr_out, bcf_record);
+            keptRecords++;
+        } else {
+            removedRecords++;
         }
+    }
+    
+    if (verbose_flag) {
+        printf("%d record%s kept.\n", (int)keptRecords, keptRecords != 1?"s":"");
+        printf("%d record%s removed.\n", (int)removedRecords, removedRecords != 1?"s":"");
     }
     
     hts_close(htsInFile);
