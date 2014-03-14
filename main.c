@@ -136,7 +136,7 @@ int main(int argc, char * const *argv)
     }
     
     if (exons_filename == NULL) {
-        printf("No exon file specified.\n");
+        printf("No exon file specified. Use -e to specify the exon file.\n");
         print_usage(stdout, 1);
     }
     
