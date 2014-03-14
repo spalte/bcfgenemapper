@@ -4,7 +4,7 @@ all: $(PROG)
 build: all
 
 # Adjust $(HTSDIR) to point to your top-level htslib directory
-HTSDIR = ../htslib
+HTSDIR = ./htslib
 include $(HTSDIR)/htslib.mk
 HTSLIB = $(HTSDIR)/libhts.a
 

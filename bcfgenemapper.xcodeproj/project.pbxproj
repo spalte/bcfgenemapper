@@ -294,11 +294,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../htslib,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/Users/spalte/Documents/Rhesus/htslib,
+					"$(SRCROOT)/htslib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -310,11 +306,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../htslib,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/Users/spalte/Documents/Rhesus/htslib,
+					"$(SRCROOT)/htslib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
