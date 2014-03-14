@@ -96,7 +96,6 @@ int main(int argc, char * const *argv)
         };
 
         int option_index = 0;
-        
         c = getopt_long(argc, argv, short_options, long_options, &option_index);
         
         if (c == -1)
@@ -106,36 +105,28 @@ int main(int argc, char * const *argv)
         {
             case 'h':
                 print_usage (stdout, 0);
-            
-            case 'v':   /* -v or --verbose */
+            case 'v':
                 verbose_flag = 1;
                 break;
-
             case 'o':
                 output_filename = optarg;
                 break;
-                
             case 'O':
                 output_type = optarg;
                 if (validate_output_type(output_type) == 0) {
-                    fprintf(stdout, "Invalid output type\n");
+                    fprintf(stdout, "Invalid output type: \"%s\", legal values are b|u|z|v\n", output_type);
                     print_usage(stdout, 1);
                 }
                 break;
-                
             case 'e':
                 exons_filename = optarg;
                 break;
-                
-
             case 'c':
                 csv_filename = optarg;
                 break;
-                
             case '?':
                 print_usage(stdout, 1);
                 break;
-                
             default:
                 abort();
         }
