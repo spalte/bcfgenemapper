@@ -20,6 +20,20 @@
                ReferencedContainer = "container:bcfgenemapper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4FA769B318D3272D0085E34D"
+               BuildableName = "bogusbcfgenemapper"
+               BlueprintName = "bogusbcfgenemapper"
+               ReferencedContainer = "container:bcfgenemapper.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
