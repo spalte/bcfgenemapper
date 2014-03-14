@@ -1,0 +1,6 @@
+xcuserdata
+*.xccheckout
+*.DS_Store
+__MACOSX/
+version.h
+
