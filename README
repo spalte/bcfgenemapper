@@ -1,0 +1,5 @@
+bcfgenemapper
+=============
+
+Use the following command to clone with the htslib submodule:
+git clone --recurse-submodules git@github.com:spalte/bcfgenemapper.git
