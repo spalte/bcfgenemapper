@@ -43,7 +43,7 @@ force:
 .c.o:
 		$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $< -o $@
 
-main.o: version.h $(HTSDIR)/version.h
+main.o: main.c genemapper.h version.h $(HTSDIR)/version.h
 genemapper.o: genemapper.c genemapper.h
 
 bcfgenemapper: $(HTSLIB) $(OBJS)

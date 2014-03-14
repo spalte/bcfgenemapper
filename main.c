@@ -204,7 +204,7 @@ int main(int argc, char * const *argv)
     
     int error = bcf_hdr_append(hdr_out, "##INFO=<ID=GENEMAP,Number=1,Type=Integer,Description=\"Gene Location\">");
     if (error) {
-        printf("bcf_hdr_append error %d", error);
+        fprintf(stderr, "bcf_hdr_append error %d", error);
         abort();
     }
 
