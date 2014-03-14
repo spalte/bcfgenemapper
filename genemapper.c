@@ -1,6 +1,6 @@
 //
 //  genemapper.c
-//  vcfparser
+//  bcfgenemapper
 //
 //  Created by Joël Spaltenstein on 3/13/14.
 //  Copyright (c) 2014 Spaltenstein Natural Image. All rights reserved.
