@@ -38,7 +38,7 @@ version.h:
 
 
 .SUFFIXES:.c .o
-.PHONY:all clean clean-all distclean install lib tags test testclean force plugins
+.PHONY:all build clean clean-all distclean install lib tags test testclean force plugins
 
 force:
 

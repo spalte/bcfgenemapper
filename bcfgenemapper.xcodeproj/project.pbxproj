@@ -73,16 +73,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4FA7699018D326540085E34D = {
+		4F6C9D1418D3325A005B843D /* bogus libraires */ = {
 			isa = PBXGroup;
 			children = (
 				4FA769C118D32D5C0085E34D /* libz.dylib */,
 				4FA769BF18D32D010085E34D /* libhts.a */,
+			);
+			name = "bogus libraires";
+			sourceTree = "<group>";
+		};
+		4FA7699018D326540085E34D = {
+			isa = PBXGroup;
+			children = (
 				4FA769A518D3268C0085E34D /* genemapper.c */,
 				4FA769A618D3268C0085E34D /* genemapper.h */,
 				4FA769A718D3268C0085E34D /* main.c */,
 				4FA769A818D3268C0085E34D /* Makefile */,
 				4FA7699A18D326540085E34D /* Products */,
+				4F6C9D1418D3325A005B843D /* bogus libraires */,
 			);
 			sourceTree = "<group>";
 		};
@@ -199,6 +207,7 @@
 		4F6C9D0F18D32FD6005B843D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -206,6 +215,7 @@
 		4F6C9D1018D32FD6005B843D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -225,7 +235,6 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -263,7 +272,6 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
