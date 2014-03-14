@@ -35,7 +35,7 @@ char validate_output_type(const char *type)
 void print_usage (FILE* stream, int exit_code)
 {
     fprintf(stream, "Gene Mapper (%s, htslib version:%s)\n", BCFGENEMAPPER_VERSION, hts_version());
-    fprintf(stream, "Usage:  %s <-e exon_filename> [options] [input filename]\n", program_name);
+    fprintf(stream, "Usage:  %s <-e exon_filename> [options] [input_filename]\n", program_name);
     fprintf(stream,
              "  -h  --help                 Display this usage information.\n"
              "  -o  --output filename      Write output to file.\n"

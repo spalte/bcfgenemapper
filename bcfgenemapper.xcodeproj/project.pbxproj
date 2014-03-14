@@ -11,7 +11,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 4F6C9D0E18D32FD6005B843D /* Build configuration list for PBXAggregateTarget "sign_bcfgenemapper" */;
 			buildPhases = (
-				4F6C9D1318D32FEE005B843D /* ShellScript */,
+				4F6C9D1318D32FEE005B843D /* Code Sign */,
 			);
 			dependencies = (
 				4F6C9D1218D32FE2005B843D /* PBXTargetDependency */,
@@ -152,13 +152,14 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4F6C9D1318D32FEE005B843D /* ShellScript */ = {
+		4F6C9D1318D32FEE005B843D /* Code Sign */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Code Sign";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
