@@ -330,6 +330,7 @@
 				4F6C9D1018D32FD6005B843D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4FA7699418D326540085E34D /* Build configuration list for PBXProject "bcfgenemapper" */ = {
 			isa = XCConfigurationList;

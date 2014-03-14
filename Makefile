@@ -25,8 +25,6 @@ INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA    = $(INSTALL) -m 644
 
 
-all:$(PROG) plugins
-
 # See htslib/Makefile
 PACKAGE_VERSION  = 0.0.1
 ifneq "$(wildcard .git)" ""

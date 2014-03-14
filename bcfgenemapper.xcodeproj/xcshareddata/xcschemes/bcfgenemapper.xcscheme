@@ -58,11 +58,31 @@
       </PathRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "test_files/Rh-test.vcf"
+            argument = "-e"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "test_files/Rh.out.vcf"
+            argument = "RHCEExons"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-o"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "test_files/Rh-out.vcf"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-O"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "v"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "test_files/Rh-test.vcf"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
