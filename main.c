@@ -13,8 +13,6 @@
 #include "genemapper.h"
 #include "version.h"
 
-
-/* Flag set by ‘--verbose’. */
 static int verbose_flag;
 
 static const char* program_name;
@@ -36,17 +34,37 @@ char validate_output_type(const char *type)
 
 void print_usage (FILE* stream, int exit_code)
 {
-    fprintf (stream, "Gene Mapper (%s)\n", BCFGENEMAPPER_VERSION);
-    fprintf (stream, "Usage:  %s <-e exon_filename> [options] [input filename]\n", program_name);
-    fprintf (stream,
+    fprintf(stream, "Gene Mapper (%s, htslib version:%s)\n", BCFGENEMAPPER_VERSION, hts_version());
+    fprintf(stream, "Usage:  %s <-e exon_filename> [options] [input filename]\n", program_name);
+    fprintf(stream,
              "  -h  --help                 Display this usage information.\n"
              "  -o  --output filename      Write output to file.\n"
-             "  -O  --output-type b|u|z|v  Compressed BCF (b), uncompressed BCF (u), compressed VCF (z), uncompressed VCF (v).\n"
+             "  -O  --output-type b|u|z|v  Compressed BCF (b), Uncompressed BCF (u),\n"
+             "                             Compressed VCF (z), Uncompressed VCF (v).\n"
              "  -e  --exons filename       Read exon ranges from this file.\n"
              "  -c  --csv filename         Write variants to this file.\n"
              "  -v  --verbose              Print verbose messages.\n\n"
-             "If the input or output filenames are ommited %s will use stdin and stdout respectively\n", program_name);
-    exit (exit_code);
+             "If the input or output filenames are omitted %s will use\n"
+             "stdin and stdout respectively\n\n", program_name);
+    fprintf(stream,
+             "The format of the exon range file is: \"(start_position) (end_position)newLine\"\n"
+             "Both start and end are inclusive and 0-indexed (like in NCBI XML files).\n"
+             "If the exon is on the (-)strand, the start should be a larger index than\n"
+             "the end index.\n\n"
+             "Example for the RHCE reference peptide (NP_065231.3) onto GRCh38 Chr1\n"
+             "(which happens to be on the (-)strand):\n"
+             "25420785 25420638\n"
+             "25408868 25408682\n"
+             "25402745 25402595\n"
+             "25392140 25391993\n"
+             "25390914 25390748\n"
+             "25389112 25388975\n"
+             "25385843 25385710\n"
+             "25375427 25375348\n"
+             "25370539 25370466\n"
+             "25362552 25362526\n");
+
+    exit(exit_code);
 }
 
 int main(int argc, char * const *argv)

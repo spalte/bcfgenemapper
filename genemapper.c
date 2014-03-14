@@ -127,7 +127,7 @@ void gene_mapper_print_exons(gene_mapper_t* geneMapper, FILE *fp)
 {
     int32_t i;
 
-    fprintf(fp, "There are %d exons in the exon file.\n", (int)geneMapper->exonCount);
+    fprintf(fp, "There %s %d exons in the exon file.\n", geneMapper->exonCount == 1?"is":"are", (int)geneMapper->exonCount);
     
     for (i = 0; i < geneMapper->exonCount; i++) {
         exon_range_t exon = geneMapper->exons[i];

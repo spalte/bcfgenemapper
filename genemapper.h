@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-/* All positions are assumed to be 1-indexed */
+/* All positions are assumed to be 0-indexed */
 
 typedef struct { // exon range, start and end are inclusive
     int32_t start;
