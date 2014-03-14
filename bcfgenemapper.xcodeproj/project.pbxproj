@@ -6,12 +6,37 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		4F6C9D0D18D32FD6005B843D /* sign_bcfgenemapper */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 4F6C9D0E18D32FD6005B843D /* Build configuration list for PBXAggregateTarget "sign_bcfgenemapper" */;
+			buildPhases = (
+				4F6C9D1318D32FEE005B843D /* ShellScript */,
+			);
+			dependencies = (
+				4F6C9D1218D32FE2005B843D /* PBXTargetDependency */,
+			);
+			name = sign_bcfgenemapper;
+			productName = sign_bcfgenemapper;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
-		4FA769B718D3272D0085E34D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FA769B618D3272D0085E34D /* main.c */; };
-		4FA769B918D3272D0085E34D /* bogusbcfgenemapper.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4FA769B818D3272D0085E34D /* bogusbcfgenemapper.1 */; };
 		4FA769BD18D327330085E34D /* genemapper.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FA769A518D3268C0085E34D /* genemapper.c */; };
 		4FA769BE18D327380085E34D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FA769A718D3268C0085E34D /* main.c */; };
+		4FA769C018D32D010085E34D /* libhts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FA769BF18D32D010085E34D /* libhts.a */; };
+		4FA769C218D32D5C0085E34D /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FA769C118D32D5C0085E34D /* libz.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4F6C9D1118D32FE2005B843D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4FA7699118D326540085E34D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4FA769AC18D326E20085E34D;
+			remoteInfo = bcfgenemapper;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		4FA769B218D3272D0085E34D /* CopyFiles */ = {
@@ -20,7 +45,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				4FA769B918D3272D0085E34D /* bogusbcfgenemapper.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -32,8 +56,8 @@
 		4FA769A718D3268C0085E34D /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		4FA769A818D3268C0085E34D /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		4FA769B418D3272D0085E34D /* bogusbcfgenemapper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bogusbcfgenemapper; sourceTree = BUILT_PRODUCTS_DIR; };
-		4FA769B618D3272D0085E34D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		4FA769B818D3272D0085E34D /* bogusbcfgenemapper.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = bogusbcfgenemapper.1; sourceTree = "<group>"; };
+		4FA769BF18D32D010085E34D /* libhts.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhts.a; path = ../htslib/libhts.a; sourceTree = "<group>"; };
+		4FA769C118D32D5C0085E34D /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +65,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FA769C218D32D5C0085E34D /* libz.dylib in Frameworks */,
+				4FA769C018D32D010085E34D /* libhts.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,11 +76,12 @@
 		4FA7699018D326540085E34D = {
 			isa = PBXGroup;
 			children = (
+				4FA769C118D32D5C0085E34D /* libz.dylib */,
+				4FA769BF18D32D010085E34D /* libhts.a */,
 				4FA769A518D3268C0085E34D /* genemapper.c */,
 				4FA769A618D3268C0085E34D /* genemapper.h */,
 				4FA769A718D3268C0085E34D /* main.c */,
 				4FA769A818D3268C0085E34D /* Makefile */,
-				4FA769B518D3272D0085E34D /* bogusbcfgenemapper */,
 				4FA7699A18D326540085E34D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -67,15 +94,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		4FA769B518D3272D0085E34D /* bogusbcfgenemapper */ = {
-			isa = PBXGroup;
-			children = (
-				4FA769B618D3272D0085E34D /* main.c */,
-				4FA769B818D3272D0085E34D /* bogusbcfgenemapper.1 */,
-			);
-			path = bogusbcfgenemapper;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
@@ -86,10 +104,11 @@
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
 			dependencies = (
 			);
 			name = bcfgenemapper;
-			passBuildSettingsInEnvironment = 1;
+			passBuildSettingsInEnvironment = 0;
 			productName = bcfgenemapper;
 		};
 /* End PBXLegacyTarget section */
@@ -134,17 +153,33 @@
 			projectRoot = "";
 			targets = (
 				4FA769AC18D326E20085E34D /* bcfgenemapper */,
+				4F6C9D0D18D32FD6005B843D /* sign_bcfgenemapper */,
 				4FA769B318D3272D0085E34D /* bogusbcfgenemapper */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4F6C9D1318D32FEE005B843D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -n \"${CODE_SIGN_IDENTITY}\" ]; then\ncodesign --force -i ch.naturalimage.bcfgenemapper -s \"${CODE_SIGN_IDENTITY}\" \"${SRCROOT}/bcfgenemapper\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4FA769B018D3272D0085E34D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FA769B718D3272D0085E34D /* main.c in Sources */,
 				4FA769BD18D327330085E34D /* genemapper.c in Sources */,
 				4FA769BE18D327380085E34D /* main.c in Sources */,
 			);
@@ -152,7 +187,29 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		4F6C9D1218D32FE2005B843D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4FA769AC18D326E20085E34D /* bcfgenemapper */;
+			targetProxy = 4F6C9D1118D32FE2005B843D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		4F6C9D0F18D32FD6005B843D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		4F6C9D1018D32FD6005B843D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		4FA769A018D326540085E34D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -168,6 +225,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -205,6 +263,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -224,25 +283,12 @@
 		4FA769AE18D326E20085E34D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEBUGGING_SYMBOLS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
 		4FA769AF18D326E20085E34D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -258,6 +304,10 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../htslib,
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/spalte/Documents/Rhesus/htslib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -270,6 +320,10 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../htslib,
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/spalte/Documents/Rhesus/htslib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -277,6 +331,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4F6C9D0E18D32FD6005B843D /* Build configuration list for PBXAggregateTarget "sign_bcfgenemapper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F6C9D0F18D32FD6005B843D /* Debug */,
+				4F6C9D1018D32FD6005B843D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		4FA7699418D326540085E34D /* Build configuration list for PBXProject "bcfgenemapper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -293,6 +355,7 @@
 				4FA769AF18D326E20085E34D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4FA769BA18D3272D0085E34D /* Build configuration list for PBXNativeTarget "bogusbcfgenemapper" */ = {
 			isa = XCConfigurationList;
@@ -301,6 +364,7 @@
 				4FA769BC18D3272D0085E34D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

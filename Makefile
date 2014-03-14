@@ -34,7 +34,7 @@ PACKAGE_VERSION := $(shell git describe --always --dirty)
 version.h: $(if $(wildcard version.h),$(if $(findstring "$(PACKAGE_VERSION)",$(shell cat version.h)),,force))
 endif
 version.h:
-	echo '#define VCFPARSER_VERSION "$(PACKAGE_VERSION)"' > $@
+	echo '#define BCFGENEMAPPER_VERSION "$(PACKAGE_VERSION)"' > $@
 
 
 .SUFFIXES:.c .o
@@ -45,17 +45,6 @@ force:
 .c.o:
 		$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $< -o $@
 
-test: $(PROG) plugins test/test-rbuf
-		./test/test.pl
-
-PLUGINC = $(foreach dir, plugins, $(wildcard $(dir)/*.c))
-PLUGINS = $(PLUGINC:.c=.so)
-
-plugins: $(PLUGINS)
-
-%.so: %.c vcfannotate.c $(HTSDIR)/libhts.so
-	$(CC) $(CFLAGS) $(INCLUDES) -fPIC -shared -o $@ -L$(HTSDIR) $< -lhts
-
 main.o: version.h $(HTSDIR)/version.h
 genemapper.o: genemapper.c genemapper.h
 
@@ -63,13 +52,8 @@ bcfgenemapper: $(HTSLIB) $(OBJS)
 		$(CC) $(CFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl
 
 
-install: $(PROG)
-		mkdir -p $(DESTDIR)$(bindir) $(DESTDIR)$(man1dir)
-		$(INSTALL_PROGRAM) $(PROG) plot-vcfstats vcfutils.pl $(DESTDIR)$(bindir)
-		$(INSTALL_DATA) bcftools.1 $(DESTDIR)$(man1dir)
-
 clean:
-		rm -fr gmon.out *.o a.out *.dSYM *~ $(PROG) version.h plugins/*.so
+		rm -fr *.o *.dSYM *~ $(PROG) version.h
 
 distclean: clean
 	-rm -f TAGS
@@ -77,4 +61,4 @@ distclean: clean
 clean-all: clean clean-htslib
 
 tags:
-	ctags -f TAGS *.[ch] plugins/*.[ch]
+	ctags -f TAGS *.[ch]

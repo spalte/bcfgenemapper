@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4FA769AC18D326E20085E34D"
-               BuildableName = "bcfgenemapper"
-               BlueprintName = "bcfgenemapper"
+               BlueprintIdentifier = "4F6C9D0D18D32FD6005B843D"
+               BuildableName = "sign_bcfgenemapper"
+               BlueprintName = "sign_bcfgenemapper"
                ReferencedContainer = "container:bcfgenemapper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,15 +29,6 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4FA769AC18D326E20085E34D"
-            BuildableName = "bcfgenemapper"
-            BlueprintName = "bcfgenemapper"
-            ReferencedContainer = "container:bcfgenemapper.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -48,15 +39,19 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4FA769AC18D326E20085E34D"
-            BuildableName = "bcfgenemapper"
-            BlueprintName = "bcfgenemapper"
-            ReferencedContainer = "container:bcfgenemapper.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
+      <PathRunnable
+         FilePath = "/Users/spalte/Documents/Rhesus/bcfgenemapper/bcfgenemapper">
+      </PathRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "test_files/Rh-test.vcf"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "test_files/Rh.out.vcf"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -66,15 +61,6 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4FA769AC18D326E20085E34D"
-            BuildableName = "bcfgenemapper"
-            BlueprintName = "bcfgenemapper"
-            ReferencedContainer = "container:bcfgenemapper.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
