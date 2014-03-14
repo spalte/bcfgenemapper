@@ -24,8 +24,6 @@
 /* Begin PBXBuildFile section */
 		4FA769BD18D327330085E34D /* genemapper.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FA769A518D3268C0085E34D /* genemapper.c */; };
 		4FA769BE18D327380085E34D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FA769A718D3268C0085E34D /* main.c */; };
-		4FA769C018D32D010085E34D /* libhts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FA769BF18D32D010085E34D /* libhts.a */; };
-		4FA769C218D32D5C0085E34D /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FA769C118D32D5C0085E34D /* libz.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,8 +54,6 @@
 		4FA769A718D3268C0085E34D /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		4FA769A818D3268C0085E34D /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		4FA769B418D3272D0085E34D /* bogusbcfgenemapper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bogusbcfgenemapper; sourceTree = BUILT_PRODUCTS_DIR; };
-		4FA769BF18D32D010085E34D /* libhts.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhts.a; path = ../htslib/libhts.a; sourceTree = "<group>"; };
-		4FA769C118D32D5C0085E34D /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,23 +61,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FA769C218D32D5C0085E34D /* libz.dylib in Frameworks */,
-				4FA769C018D32D010085E34D /* libhts.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4F6C9D1418D3325A005B843D /* bogus libraires */ = {
-			isa = PBXGroup;
-			children = (
-				4FA769C118D32D5C0085E34D /* libz.dylib */,
-				4FA769BF18D32D010085E34D /* libhts.a */,
-			);
-			name = "bogus libraires";
-			sourceTree = "<group>";
-		};
 		4FA7699018D326540085E34D = {
 			isa = PBXGroup;
 			children = (
@@ -90,7 +75,6 @@
 				4FA769A718D3268C0085E34D /* main.c */,
 				4FA769A818D3268C0085E34D /* Makefile */,
 				4FA7699A18D326540085E34D /* Products */,
-				4F6C9D1418D3325A005B843D /* bogus libraires */,
 			);
 			sourceTree = "<group>";
 		};
