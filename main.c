@@ -14,6 +14,7 @@
 #include "version.h"
 
 static int verbose_flag;
+static int strip_flag;
 
 static const char* program_name;
 
@@ -37,32 +38,34 @@ void print_usage (FILE* stream, int exit_code)
     fprintf(stream, "Gene Mapper (%s, htslib version:%s)\n", BCFGENEMAPPER_VERSION, hts_version());
     fprintf(stream, "Usage:  %s <-e exon_filename> [options] [input_filename]\n", program_name);
     fprintf(stream,
-             "  -h  --help                 Display this usage information.\n"
-             "  -o  --output filename      Write output to file.\n"
-             "  -O  --output-type b|u|z|v  Compressed BCF (b), Uncompressed BCF (u),\n"
-             "                             Compressed VCF (z), Uncompressed VCF (v).\n"
-             "  -e  --exons filename       Read exon ranges from this file.\n"
-             "  -c  --csv filename         Write variants to this file.\n"
-             "  -v  --verbose              Print verbose messages.\n\n"
-             "If the input or output filenames are omitted %s will use\n"
-             "stdin and stdout respectively\n\n", program_name);
+            "  -h  --help                 Display this usage information.\n"
+            "  -o  --output filename      Write output to file.\n"
+            "  -O  --output-type b|u|z|v  Compressed BCF (b), Uncompressed BCF (u),\n"
+            "                             Compressed VCF (z), Uncompressed VCF (v).\n"
+            "  -e  --exons filename       Read exon ranges from this file.\n"
+            "  -c  --csv filename         Write variants to a cvs file.\n"
+            "  -v  --verbose              Print verbose messages.\n\n"
+            "  -s  --strip                Don't output variants that are not in exons.\n"
+            "  -v  --verbose              Print verbose messages.\n\n"
+            "If the input or output filenames are omitted %s will use\n"
+            "stdin and stdout respectively\n\n", program_name);
     fprintf(stream,
-             "The format of the exon range file is: \"(start_position) (end_position)newLine\"\n"
-             "Both start and end are inclusive and 0-indexed (like in NCBI XML files).\n"
-             "If the exon is on the (-)strand, the start should be a larger index than\n"
-             "the end index.\n\n"
-             "Example for the RHCE reference peptide (NP_065231.3) onto GRCh38 Chr1\n"
-             "(which happens to be on the (-)strand):\n"
-             "25420785 25420638\n"
-             "25408868 25408682\n"
-             "25402745 25402595\n"
-             "25392140 25391993\n"
-             "25390914 25390748\n"
-             "25389112 25388975\n"
-             "25385843 25385710\n"
-             "25375427 25375348\n"
-             "25370539 25370466\n"
-             "25362552 25362526\n");
+            "The format of the exon range file is: \"(start_position) (end_position)newLine\"\n"
+            "Both start and end are inclusive and 0-indexed (like in NCBI XML files).\n"
+            "If the exon is on the (-)strand, the start should be a larger index than\n"
+            "the end index.\n\n"
+            "Example for the RHCE reference peptide (NP_065231.3) onto GRCh38 Chr1\n"
+            "(which happens to be on the (-)strand):\n"
+            "25420785 25420638\n"
+            "25408868 25408682\n"
+            "25402745 25402595\n"
+            "25392140 25391993\n"
+            "25390914 25390748\n"
+            "25389112 25388975\n"
+            "25385843 25385710\n"
+            "25375427 25375348\n"
+            "25370539 25370466\n"
+            "25362552 25362526\n");
 
     exit(exit_code);
 }
@@ -82,10 +85,11 @@ int main(int argc, char * const *argv)
     
     while (1)
     {
-        static const char* const short_options = "vho:O:e:c:";
+        static const char* const short_options = "vsho:O:e:c:";
         static struct option long_options[] =
         {
             {"verbose",     no_argument,       NULL, 'v'},
+            {"strip",       no_argument,       NULL, 's'},
             {"help",        no_argument,       NULL, 'h'},
 
             {"output",      required_argument, NULL, 'o'},
@@ -108,14 +112,17 @@ int main(int argc, char * const *argv)
             case 'v':
                 verbose_flag = 1;
                 break;
+            case 's':
+                strip_flag = 1;
+                break;
             case 'o':
                 output_filename = optarg;
                 break;
             case 'O':
                 output_type = optarg;
                 if (validate_output_type(output_type) == 0) {
-                    fprintf(stdout, "Invalid output type: \"%s\", legal values are b|u|z|v\n", output_type);
-                    print_usage(stdout, 1);
+                    fprintf(stderr, "Invalid output type: \"%s\", legal values are b|u|z|v\n", output_type);
+                    print_usage(stderr, 1);
                 }
                 break;
             case 'e':
@@ -128,6 +135,7 @@ int main(int argc, char * const *argv)
                 print_usage(stdout, 1);
                 break;
             default:
+                fprintf(stderr, "about to abort because c = %d, %c\n", c, (char)c);
                 abort();
         }
     }
@@ -136,8 +144,8 @@ int main(int argc, char * const *argv)
     if (optind + 1 == argc) {
         input_filename = argv[optind];
     } else if (optind < argc) {
-        printf("Specify only one input file.\n");
-        print_usage(stdout, 1);
+        fprintf(stderr, "Specify only one input file.\n");
+        print_usage(stderr, 1);
     }
     
     if (input_filename == NULL && output_filename == NULL && exons_filename == NULL) {
@@ -145,20 +153,20 @@ int main(int argc, char * const *argv)
     }
     
     if (exons_filename == NULL) {
-        printf("No exon file specified. Use -e to specify the exon file.\n");
-        print_usage(stdout, 1);
+        fprintf(stderr, "No exon file specified. Use -e to specify the exon file.\n");
+        print_usage(stderr, 1);
     }
     
     FILE *exonFp = fopen(exons_filename, "r");
     if (exonFp < 0) {
-        printf("Unable to open exon file. \"%s\".", exons_filename);
-        print_usage(stdout, 1);
+        fprintf(stderr, "Unable to open exon file. \"%s\".", exons_filename);
+        print_usage(stderr, 1);
     }
     
     gene_mapper_t *geneMapper = gene_mapper_file_init(exonFp);
     if (gene_mapper_exon_count(geneMapper) == 0) {
-        printf("Unable to read exons from file \"%s\".", exons_filename);
-        print_usage(stdout, 1);
+        fprintf(stderr, "Unable to read exons from file \"%s\".", exons_filename);
+        print_usage(stderr, 1);
     }
     fclose(exonFp);
     exonFp = NULL;
@@ -172,8 +180,8 @@ int main(int argc, char * const *argv)
     
     htsFile *htsInFile = hts_open(input_filename, "r");
     if (htsInFile < 0) {
-        printf("Unable to open input file \"%s\".", input_filename);
-        print_usage(stdout, 1);
+        fprintf(stderr, "Unable to open input file \"%s\".", input_filename);
+        print_usage(stderr, 1);
     }
     
     char outputFileMode[3] = {'w', 'v', 0};
@@ -182,8 +190,8 @@ int main(int argc, char * const *argv)
     }
     htsFile *vcfOutFile = hts_open(output_filename, outputFileMode);
     if (htsInFile < 0) {
-        printf("Unable to open output file \"%s\".", output_filename);
-        print_usage(stdout, 1);
+        fprintf(stderr, "Unable to open output file \"%s\".", output_filename);
+        print_usage(stderr, 1);
     }
     
     if (verbose_flag) {
@@ -208,7 +216,7 @@ int main(int argc, char * const *argv)
     while (bcf_read(htsInFile, bcf_header, bcf_record)>=0 )
     {
         int32_t geneLocation = gene_mapper_map_position(geneMapper, bcf_record->pos);
-        if (geneLocation >= 0) {
+        if (geneLocation >= 0 || strip_flag == 0) {
             geneLocation++; // we 0 index all locations, but locations in the vcf file are 1 indexed;
             bcf_update_info_int32(hdr_out, bcf_record, "GENEMAP", &geneLocation, 1);
             bcf_write(vcfOutFile, hdr_out, bcf_record);
