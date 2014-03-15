@@ -18,16 +18,21 @@ typedef struct {
 } csv_formatter_sample_t;
 
 typedef struct {
-    int variationsCount;
+    int32_t position;
+    
+    int32_t variationsCount; // this will be the number of samples
     const char **variations;
-    char allele; // 0 or 1
 } csv_formatter_variations_t;
 
 typedef struct {
     csv_formatter_sample_t *referenceSample;
     
-    int sampleCount;
+    int32_t sampleCount;
     csv_formatter_sample_t *samples;
+    
+    int32_t variationsCount;
+    int32_t variationsAllocated;
+    csv_formatter_variations_t *variations;
 } csv_formatter_t;
 
 csv_formatter_t *csv_formatter_sample_init(const char *sampleName, char allele);

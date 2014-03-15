@@ -48,6 +48,7 @@ genemapper.o: genemapper.c genemapper.h main.h
 csvformatter.o: csvformatter.c csvformatter.h
 
 genemapper.h: main.h
+main.h: $(HTSDIR)/version.h
 
 bcfgenemapper: $(HTSLIB) $(OBJS)
 		$(CC) $(CFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl

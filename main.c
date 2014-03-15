@@ -34,6 +34,25 @@ char validate_output_type(const char *type)
     }
 }
 
+// returns 0 on success
+int bcf_update_genemapper_info(const bcf_hdr_t *hdr, bcf1_t *line, int32_t index, strand_t strand)
+{
+    int oneBasedIndex = index+1; // we use 1 base indexing, but vcf uses 0 base indexing
+    int error = 0;
+    error = bcf_update_info_int32(hdr, line, GENEMAP, &oneBasedIndex, 1);
+    if (error) {
+        return error;
+    }
+    char strandStr[] = {0,0};
+    strandStr[0] = strand;
+    error = bcf_update_info_string(hdr, line, GENEMAP_STRAND, strandStr);
+    if (error) {
+        return error;
+    }
+    return 0;
+}
+
+
 void print_usage (FILE* stream, int exit_code)
 {
     fprintf(stream, "Gene Mapper (%s, htslib version:%s)\n", BCFGENEMAPPER_VERSION, hts_version());
@@ -226,11 +245,7 @@ int main(int argc, char * const *argv)
         int32_t geneLocation = gene_mapper_map_position(geneMapper, bcf_record->pos, &exon);
         
         if (geneLocation >= 0) {
-            geneLocation++; // we 0 index all locations, but locations in the vcf file are 1 indexed;
-            bcf_update_info_int32(hdr_out, bcf_record, GENEMAP, &geneLocation, 1);
-            char strand[] = {0,0};
-            strand[0] = exon_range_strand(exon);
-            bcf_update_info_string(hdr_out, bcf_record,GENEMAP_STRAND, strand);
+            bcf_update_genemapper_info(hdr_out, bcf_record, geneLocation, exon_range_strand(exon));
             updatedRecords++;
             bcf_write(vcfOutFile, hdr_out, bcf_record);
             keptRecords++;
