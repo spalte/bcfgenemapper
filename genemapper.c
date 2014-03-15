@@ -65,7 +65,7 @@ void gene_mapper_destroy(gene_mapper_t* geneMapper)
     free(geneMapper);
 }
 
-int32_t gene_mapper_map_position(gene_mapper_t* geneMapper, int32_t genomePosition)
+int32_t gene_mapper_map_position(gene_mapper_t* geneMapper, int32_t genomePosition, exon_range_t* exonRangeOut)
 {
     int32_t runLength = 0;
     int32_t i;
@@ -77,6 +77,9 @@ int32_t gene_mapper_map_position(gene_mapper_t* geneMapper, int32_t genomePositi
         if (plusExon) {
             exonLength = (exon.end - exon.start) + 1;
             if (genomePosition <= exon.end && genomePosition >= exon.start) {
+                if (exonRangeOut) {
+                    *exonRangeOut = exon;
+                }
                 return runLength + (genomePosition - exon.start);
             } else {
                 runLength += exonLength;
@@ -84,6 +87,9 @@ int32_t gene_mapper_map_position(gene_mapper_t* geneMapper, int32_t genomePositi
         } else {
             exonLength = (exon.start - exon.end) + 1;
             if (genomePosition <= exon.start && genomePosition >= exon.end) {
+                if (exonRangeOut) {
+                    *exonRangeOut = exon;
+                }
                 return runLength + (exon.start - genomePosition);
             } else {
                 runLength += exonLength;
@@ -132,11 +138,7 @@ void gene_mapper_print_exons(gene_mapper_t* geneMapper, FILE *fp)
     for (i = 0; i < geneMapper->exonCount; i++) {
         exon_range_t exon = geneMapper->exons[i];
         fprintf(fp, "    %8d  %8d ", (int)exon.start, (int)exon.end);
-        if (positive_strand_exon_range(exon)) {
-            fprintf(fp, "  Length: %5d  (+)strand\n", (int)(exon.end - exon.start) + 1);
-        } else {
-            fprintf(fp, "  Length: %5d  (-)strand\n", (int)(exon.start - exon.end) + 1);
-        }
+        fprintf(fp, "  Length: %5d  (%c)strand\n", (int)(exon.end - exon.start) + 1, exon_range_strand(exon));
     }
 }
 

@@ -22,6 +22,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		4F7C2F8B18D49D1500A8A01F /* csvformatter.c in Sources */ = {isa = PBXBuildFile; fileRef = 4F7C2F8A18D49D1500A8A01F /* csvformatter.c */; };
 		4FA769BD18D327330085E34D /* genemapper.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FA769A518D3268C0085E34D /* genemapper.c */; };
 		4FA769BE18D327380085E34D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FA769A718D3268C0085E34D /* main.c */; };
 /* End PBXBuildFile section */
@@ -49,6 +50,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4F7C2F8A18D49D1500A8A01F /* csvformatter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = csvformatter.c; sourceTree = "<group>"; };
+		4F7C2F8C18D49D2600A8A01F /* csvformatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = csvformatter.h; sourceTree = "<group>"; };
+		4F7C2F8D18D4AD3000A8A01F /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		4FA769A518D3268C0085E34D /* genemapper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = genemapper.c; sourceTree = "<group>"; };
 		4FA769A618D3268C0085E34D /* genemapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = genemapper.h; sourceTree = "<group>"; };
 		4FA769A718D3268C0085E34D /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
@@ -72,7 +76,10 @@
 			children = (
 				4FA769A518D3268C0085E34D /* genemapper.c */,
 				4FA769A618D3268C0085E34D /* genemapper.h */,
+				4F7C2F8A18D49D1500A8A01F /* csvformatter.c */,
+				4F7C2F8C18D49D2600A8A01F /* csvformatter.h */,
 				4FA769A718D3268C0085E34D /* main.c */,
+				4F7C2F8D18D4AD3000A8A01F /* main.h */,
 				4FA769A818D3268C0085E34D /* Makefile */,
 				4FA7699A18D326540085E34D /* Products */,
 			);
@@ -173,6 +180,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F7C2F8B18D49D1500A8A01F /* csvformatter.c in Sources */,
 				4FA769BD18D327330085E34D /* genemapper.c in Sources */,
 				4FA769BE18D327380085E34D /* main.c in Sources */,
 			);

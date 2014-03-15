@@ -12,6 +12,7 @@
 
 #include "genemapper.h"
 #include "version.h"
+#include "main.h"
 
 static int verbose_flag;
 static int strip_flag;
@@ -201,7 +202,12 @@ int main(int argc, char * const *argv)
     bcf_hdr_t *bcf_header = bcf_hdr_read(htsInFile);
     bcf_hdr_t *hdr_out = bcf_hdr_dup(bcf_header);
     
-    int error = bcf_hdr_append(hdr_out, "##INFO=<ID=GENEMAP,Number=1,Type=Integer,Description=\"Gene Location\">");
+    int error = bcf_hdr_append(hdr_out, GENEMAP_INFO_HEADER);
+    if (error) {
+        fprintf(stderr, "bcf_hdr_append error %d", error);
+        abort();
+    }
+    error = bcf_hdr_append(hdr_out, GENEMAP_STRAND_INFO_HEADER);
     if (error) {
         fprintf(stderr, "bcf_hdr_append error %d", error);
         abort();
@@ -210,15 +216,25 @@ int main(int argc, char * const *argv)
     bcf_hdr_write(vcfOutFile, hdr_out);
     
     int32_t keptRecords = 0;
+    int32_t updatedRecords = 0;
     int32_t removedRecords = 0;
     
     bcf1_t *bcf_record = bcf_init();
     while (bcf_read(htsInFile, bcf_header, bcf_record)>=0 )
     {
-        int32_t geneLocation = gene_mapper_map_position(geneMapper, bcf_record->pos);
-        if (geneLocation >= 0 || strip_flag == 0) {
+        exon_range_t exon;
+        int32_t geneLocation = gene_mapper_map_position(geneMapper, bcf_record->pos, &exon);
+        
+        if (geneLocation >= 0) {
             geneLocation++; // we 0 index all locations, but locations in the vcf file are 1 indexed;
-            bcf_update_info_int32(hdr_out, bcf_record, "GENEMAP", &geneLocation, 1);
+            bcf_update_info_int32(hdr_out, bcf_record, GENEMAP, &geneLocation, 1);
+            char strand[] = {0,0};
+            strand[0] = exon_range_strand(exon);
+            bcf_update_info_string(hdr_out, bcf_record,GENEMAP_STRAND, strand);
+            updatedRecords++;
+            bcf_write(vcfOutFile, hdr_out, bcf_record);
+            keptRecords++;
+        } else if (strip_flag == 0) {
             bcf_write(vcfOutFile, hdr_out, bcf_record);
             keptRecords++;
         } else {
@@ -228,6 +244,7 @@ int main(int argc, char * const *argv)
     
     if (verbose_flag) {
         printf("%d record%s kept.\n", (int)keptRecords, keptRecords != 1?"s":"");
+        printf("%d record%s updated.\n", (int)updatedRecords, updatedRecords != 1?"s":"");
         printf("%d record%s removed.\n", (int)removedRecords, removedRecords != 1?"s":"");
     }
     

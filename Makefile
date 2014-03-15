@@ -11,7 +11,7 @@ HTSLIB = $(HTSDIR)/libhts.a
 CC=			gcc
 CFLAGS=		-g -Wall -Wc++-compat -O2
 DFLAGS=
-OBJS=		main.o genemapper.o
+OBJS=		main.o genemapper.o csvformatter.o
 INCLUDES=	-I. -I$(HTSDIR)
 
 prefix      = /usr/local
@@ -43,8 +43,11 @@ force:
 .c.o:
 		$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $< -o $@
 
-main.o: main.c genemapper.h version.h $(HTSDIR)/version.h
-genemapper.o: genemapper.c genemapper.h
+main.o: main.c main.h genemapper.h csvformatter.h version.h $(HTSDIR)/version.h
+genemapper.o: genemapper.c genemapper.h main.h
+csvformatter.o: csvformatter.c csvformatter.h
+
+genemapper.h: main.h
 
 bcfgenemapper: $(HTSLIB) $(OBJS)
 		$(CC) $(CFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl
