@@ -56,6 +56,7 @@ int bcf_update_genemapper_info(const bcf_hdr_t *hdr, bcf1_t *line, int32_t index
 void print_usage (FILE* stream, int exit_code)
 {
     fprintf(stream, "Gene Mapper (%s, htslib version:%s)\n", BCFGENEMAPPER_VERSION, hts_version());
+    fprintf(stream, "Copyright (c) 2014, Spaltenstein Natural Image\n");
     fprintf(stream, "Usage:  %s <-e exon_filename> [options] [input_filename]\n", program_name);
     fprintf(stream,
             "  -h  --help                 Display this usage information.\n"

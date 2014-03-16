@@ -22,21 +22,25 @@ typedef struct {
     
     int32_t variationsCount; // this will be the number of samples
     const char **variations;
-} csv_formatter_variations_t;
+} csv_formatter_variation_list_t;
 
 typedef struct {
     csv_formatter_sample_t *referenceSample;
     
     int32_t sampleCount;
-    csv_formatter_sample_t *samples;
+    csv_formatter_sample_t **samples;
     
-    int32_t variationsCount;
-    int32_t variationsAllocated;
-    csv_formatter_variations_t *variations;
+    int32_t variationListsCount;
+    int32_t variationListsAllocated;
+    csv_formatter_variation_list_t **variationLists;
 } csv_formatter_t;
 
-csv_formatter_t *csv_formatter_sample_init(const char *sampleName, char allele);
-void csv_formatter_sample_destroy(csv_formatter_t* csvFormatter);
+csv_formatter_sample_t *csv_formatter_sample_init(const char *sampleName, char allele);
+void csv_formatter_sample_destroy(csv_formatter_sample_t* sample);
+
+csv_formatter_variation_list_t *csv_formatter_variation_list_init(int32_t sampleCount, int32_t position);
+void csv_formatter_variation_list_destroy(csv_formatter_variation_list_t *variationList);
+void csv_formatter_variation_list_add(csv_formatter_variation_list_t *variationList, const char * variation, int32_t sampleIndex);
 
 csv_formatter_t *csv_formatter_init(bcf_hdr_t *bcfHeader);
 void csv_formatter_destroy(csv_formatter_t* csvFormatter);
