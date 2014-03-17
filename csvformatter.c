@@ -65,7 +65,7 @@ void csv_formatter_variation_list_add(csv_formatter_variation_list_t *variationL
 {
     if (variationList->variationsCount <= sampleIndex) {
         fprintf(stderr, "[%s:%d %s] sampleIndex %d out of bounds\n", __FILE__, __LINE__, __FUNCTION__, sampleIndex);
-        exit(1);
+        abort();
     }
     
     if (variationList->variations[sampleIndex] != emptyString) {
@@ -96,9 +96,9 @@ csv_formatter_t *csv_formatter_init(bcf_hdr_t *bcfHeader)
         newFormatter->samples[i*2+1] = csv_formatter_sample_init(name, 2);
     }
     
-    newFormatter->variationListsAllocated = 16;
-    newFormatter->variationLists = malloc(sizeof(csv_formatter_variation_list_t *) * 16);
-    memset(newFormatter->variationLists, 0, sizeof(csv_formatter_variation_list_t *) * 16);
+    newFormatter->variationListsAllocated = 1;
+    newFormatter->variationLists = malloc(sizeof(csv_formatter_variation_list_t *));
+    memset(newFormatter->variationLists, 0, sizeof(csv_formatter_variation_list_t *));
     
     return newFormatter;
 }
@@ -120,6 +120,24 @@ void csv_formatter_destroy(csv_formatter_t* csvFormatter)
     free(csvFormatter->variationLists);
     
     free(csvFormatter);
+}
+
+static int compare_variant_lists(const void * variantList1Ptr, const void *variantList2Ptr)
+{
+    csv_formatter_variation_list_t *variantList1 = *(csv_formatter_variation_list_t **)variantList1Ptr;
+    csv_formatter_variation_list_t *variantList2 = *(csv_formatter_variation_list_t **)variantList2Ptr;
+    if (variantList1->position < variantList2->position) {
+        return -1;
+    } else if (variantList1->position == variantList2->position) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+void csv_formatter_sort_variant_lists(csv_formatter_t* csvFormatter)
+{
+    qsort(csvFormatter->variationLists, csvFormatter->variationListsCount, sizeof(csv_formatter_variation_list_t *), compare_variant_lists);
 }
 
 
@@ -211,22 +229,15 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         return;
     }
     
-    csv_formatter_variation_list_t *variationList = NULL;
-    if (csvFormatter->variationListsCount > 0) {
-        variationList = csvFormatter->variationLists[csvFormatter->variationListsCount - 1];
+    if (csvFormatter->variationListsCount == csvFormatter->variationListsAllocated) {
+        csvFormatter->variationListsAllocated *= 2;
+        csvFormatter->variationLists = realloc(csvFormatter->variationLists, sizeof(csv_formatter_variation_list_t *) * csvFormatter->variationListsAllocated);
+        memset(csvFormatter->variationLists + csvFormatter->variationListsCount, 0,
+               sizeof(csv_formatter_variation_list_t *) * (csvFormatter->variationListsAllocated - csvFormatter->variationListsCount));
     }
-    
-    if (variationList == NULL || variationList->position != genemapPosition) {
-        if (csvFormatter->variationListsCount == csvFormatter->variationListsAllocated) {
-            csvFormatter->variationListsAllocated *= 2;
-            csvFormatter->variationLists = realloc(csvFormatter->variationLists, csvFormatter->variationListsAllocated);
-            memset(csvFormatter->variationLists + csvFormatter->variationListsCount, 0,
-                   sizeof(csv_formatter_variation_list_t *) * (csvFormatter->variationListsAllocated - csvFormatter->variationListsCount));
-        }
-        csvFormatter->variationListsCount++;
-        csvFormatter->variationLists[csvFormatter->variationListsCount - 1] = csv_formatter_variation_list_init(csvFormatter->sampleCount + 1, genemapPosition);
-        variationList = csvFormatter->variationLists[csvFormatter->variationListsCount - 1];
-    }
+    csvFormatter->variationListsCount++;
+    csvFormatter->variationLists[csvFormatter->variationListsCount - 1] = csv_formatter_variation_list_init(csvFormatter->sampleCount + 1, genemapPosition);
+    csv_formatter_variation_list_t *variationList = csvFormatter->variationLists[csvFormatter->variationListsCount - 1];
     
     int *genotypesArray = NULL;
     int genotypesCount = 0;
@@ -312,6 +323,8 @@ void csv_formatter_print(csv_formatter_t* csvFormatter, FILE *fp)
 {
     int i;
     int j;
+    
+    csv_formatter_sort_variant_lists(csvFormatter);
     
     fprintf(fp, "Sample");
     for (i = 0; i< csvFormatter->variationListsCount; i++) {
