@@ -264,14 +264,14 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         const char *genotype1 = NULL;
         const char *genotype2 = NULL;
         if (genotypeIndex1 == bcf_gt_missing) {
-            genotype1 = "n";
+            genotype1 = "N";
         } else if (genotypeIndex1 == bcf_int32_vector_end) {
             genotype1 = "-";
         } else {
             genotype1 = record->d.allele[bcf_gt_allele(genotypeIndex1)];
         }
         if (genotypeIndex2 == bcf_gt_missing) {
-            genotype2 = "n";
+            genotype2 = "N";
         } else if (genotypeIndex2 == bcf_int32_vector_end) {
             genotype1 = "-";
         } else {

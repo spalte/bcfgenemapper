@@ -373,14 +373,12 @@ char complement_nucleotide(char n)
             return 'n';
         case 'N':
             return 'N';
-        case '.':
-            return '.';
         case '-':
             return '-';
         default:
             if (!isspace(n) && !ispunct(n)) {
                 if (isprint(n)) {
-                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide %c\n", n);
+                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide '%c'\n", n);
                 } else {
                     fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide ASCII value %d\n", (int)n);
                 }
