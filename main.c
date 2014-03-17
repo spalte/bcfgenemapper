@@ -10,6 +10,7 @@
 #include <htslib/vcf.h>
 #include <getopt.h>
 
+#include "csvformatter.h"
 #include "genemapper.h"
 #include "version.h"
 #include "main.h"
@@ -215,6 +216,15 @@ int main(int argc, char * const *argv)
         print_usage(stderr, 1);
     }
     
+    FILE *csvFp = NULL;
+    if (csv_filename) {
+        csvFp = fopen(csv_filename, "w");
+        if (csvFp < 0) {
+            fprintf(stderr, "Unable to create csv file. \"%s\".", csv_filename);
+            print_usage(stderr, 1);
+        }
+    }
+    
     if (verbose_flag) {
         gene_mapper_print_exons(geneMapper, stdout);
     }
@@ -235,6 +245,11 @@ int main(int argc, char * const *argv)
 
     bcf_hdr_write(vcfOutFile, hdr_out);
     
+    csv_formatter_t *csvFormatter = NULL;
+    if (csvFp) {
+        csvFormatter = csv_formatter_init(hdr_out);
+    }
+    
     int32_t keptRecords = 0;
     int32_t updatedRecords = 0;
     int32_t removedRecords = 0;
@@ -250,12 +265,22 @@ int main(int argc, char * const *argv)
             updatedRecords++;
             bcf_write(vcfOutFile, hdr_out, bcf_record);
             keptRecords++;
+            
+            if (csvFp) {
+                csv_formatter_add_record(csvFormatter, hdr_out, bcf_record);
+            }
         } else if (strip_flag == 0) {
             bcf_write(vcfOutFile, hdr_out, bcf_record);
             keptRecords++;
         } else {
             removedRecords++;
         }
+    }
+    
+    if (csvFp) {
+        csv_formatter_print(csvFormatter, csvFp);
+        fclose(csvFp);
+        csvFp = NULL;
     }
     
     if (verbose_flag) {
@@ -281,4 +306,59 @@ int main(int argc, char * const *argv)
 
     exit (0);
 }
+
+char complement_nucleotide(char n)
+{
+    switch(n){
+        case 'a':
+            return 't';
+        case 'A':
+            return 'T';
+        case 'c':
+            return 'g';
+        case 'C':
+            return 'G';
+        case 't':
+            return 'a';
+        case 'T':
+            return 'A';
+        case 'g':
+            return 'c';
+        case 'G':
+            return 'C';
+        case 'n':
+            return 'n';
+        case 'N':
+            return 'N';
+        case '.':
+            return '.';
+        case '-':
+            return '-';
+        default:
+            return 0;
+        }
+}
+
+
+const char *complement_nucleotide_sequence(const char *sequence)
+{
+    static char *complementSequence = NULL;
+    int complementSequenceLength = 0;
+    
+    if (strlen(sequence) + 1 >= complementSequenceLength) {
+        complementSequence = realloc(complementSequence, strlen(sequence) + 1);
+    }
+    
+    int i;
+    for (i = 0; i < strlen(sequence); i++) {
+        complementSequence[i] = complement_nucleotide(sequence[i]);
+    }
+    complementSequence[i] = 0;
+    
+    return complementSequence;
+}
+
+
+
+
 

@@ -82,6 +82,14 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-c"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "test_files/Rh-out.xls"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "test_files/Rh-test.vcf"
             isEnabled = "YES">
          </CommandLineArgument>

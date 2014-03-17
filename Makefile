@@ -45,7 +45,7 @@ force:
 
 main.o: main.c main.h genemapper.h csvformatter.h version.h $(HTSDIR)/version.h
 genemapper.o: genemapper.c genemapper.h main.h
-csvformatter.o: csvformatter.c csvformatter.h
+csvformatter.o: csvformatter.c csvformatter.h main.h
 
 genemapper.h: main.h
 main.h: $(HTSDIR)/version.h

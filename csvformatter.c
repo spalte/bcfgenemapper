@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include "csvformatter.h"
+#include "main.h"
 
 static const char *emptyString = "";
 
@@ -62,8 +63,8 @@ void csv_formatter_variation_list_destroy(csv_formatter_variation_list_t *variat
 
 void csv_formatter_variation_list_add(csv_formatter_variation_list_t *variationList, const char * variation, int32_t sampleIndex)
 {
-    if (variationList->variationsCount >= sampleIndex) {
-        fprintf(stderr, "[%s:%d %s] sampleIndex %d out of bounds", __FILE__,__LINE__,__FUNCTION__,sampleIndex);
+    if (variationList->variationsCount <= sampleIndex) {
+        fprintf(stderr, "[%s:%d %s] sampleIndex %d out of bounds\n", __FILE__, __LINE__, __FUNCTION__, sampleIndex);
         exit(1);
     }
     
@@ -83,7 +84,7 @@ csv_formatter_t *csv_formatter_init(bcf_hdr_t *bcfHeader)
 
     newFormatter->referenceSample = csv_formatter_sample_init("reference", 0);
     
-    newFormatter->sampleCount = bcf_hdr_nsamples(bcfHeader);
+    newFormatter->sampleCount = bcf_hdr_nsamples(bcfHeader) * 2;
     newFormatter->samples = malloc(sizeof(csv_formatter_sample_t*) * bcf_hdr_nsamples(bcfHeader) * 2);
     
     int i;
@@ -91,8 +92,8 @@ csv_formatter_t *csv_formatter_init(bcf_hdr_t *bcfHeader)
     {
         char *name = bcfHeader->samples[i];
         
-        newFormatter->samples[i*2] = csv_formatter_sample_init(name, 0);
-        newFormatter->samples[i*2+1] = csv_formatter_sample_init(name,1);
+        newFormatter->samples[i*2] = csv_formatter_sample_init(name, 1);
+        newFormatter->samples[i*2+1] = csv_formatter_sample_init(name, 2);
     }
     
     newFormatter->variationListsAllocated = 16;
@@ -122,8 +123,205 @@ void csv_formatter_destroy(csv_formatter_t* csvFormatter)
 }
 
 
+void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, bcf1_t *record)
+{
+    if (bcf_is_snp(record) == 0) { // only handle SNPs for now
+        fprintf(stderr, "***WARNING*** The CSV formater can only handle SNPs\n");
+        return;
+    }
+    
+    bcf_unpack(record, BCF_UN_ALL);
+    
+    int32_t *genemapPositionArray = NULL;
+    int genemapPositionArrayLength = 0;
+    int genemapPositionCount = 0;
+    genemapPositionCount = bcf_get_info_int32(header, record, GENEMAP, &genemapPositionArray, &genemapPositionArrayLength);
+    if (genemapPositionCount == -1) {
+        fprintf(stderr, "***WARNING*** No gene mapping defined in the bcf header\n");
+        free(genemapPositionArray);
+      return;
+    } else if (genemapPositionCount == -2) {
+        fprintf(stderr, "***WARNING*** Wrong gene mapping type in the header\n");
+        free(genemapPositionArray);
+      return;
+    } else if (genemapPositionCount == -3) {
+        fprintf(stderr, "***WARNING*** Trying to CSV format a variant call with no gene mappings\n");
+        free(genemapPositionArray);
+       return;
+    } else if (genemapPositionCount < 0) {
+        fprintf(stderr, "***WARNING*** Unknown error occured while reading the gene mappings\n");
+        free(genemapPositionArray);
+        return;
+    }
+    
+    if (genemapPositionCount > 1) {
+        fprintf(stderr, "***WARNING*** Trying to CSV format a variant call with multiple gene mappings\n");
+        free(genemapPositionArray);
+        return;
+    }
+    if (genemapPositionCount < 1) {
+        fprintf(stderr, "***WARNING*** Trying to CSV format a variant call with 0 gene mappings\n");
+        free(genemapPositionArray);
+       return;
+    }
+    
+    int32_t genemapPosition = genemapPositionArray[0];
+    free(genemapPositionArray);
+    genemapPositionArray = NULL;
+   
+    char *genemapStrandString = NULL;
+    int genemapStrandStringLength = 0;
+    int genemapStrandStringCount = 0;
+    genemapStrandStringCount = bcf_get_info_string(header, record, GENEMAP_STRAND, &genemapStrandString, &genemapStrandStringLength);
+    if (genemapStrandStringCount == -1) {
+        fprintf(stderr, "***WARNING*** No gene mapping strand defined in the bcf header\n");
+        free(genemapStrandString);
+       return;
+    } else if (genemapStrandStringCount == -2) {
+        fprintf(stderr, "***WARNING*** Wrong gene mapping strand type in the header\n");
+        free(genemapStrandString);
+       return;
+    } else if (genemapStrandStringCount == -3) {
+        fprintf(stderr, "***WARNING*** Trying to CSV format a variant call with no gene mapping strand\n");
+        free(genemapStrandString);
+        return;
+    } else if (genemapStrandStringCount < 0) {
+        fprintf(stderr, "***WARNING*** Unknown error occured while reading the gene mappings strand\n");
+        free(genemapStrandString);
+        return;
+    }
+    
+    if (genemapStrandStringCount > 1) {
+        fprintf(stderr, "***WARNING*** Trying to CSV format a variant call with multiple gene mapping strands\n");
+        free(genemapStrandString);
+        return;
+    }
+    if (genemapStrandStringCount < 1) {
+        fprintf(stderr, "***WARNING*** Trying to CSV format a variant call with 0 gene mapping strands\n");
+        free(genemapStrandString);
+        return;
+    }
+    
+    char genemapStrand = genemapStrandString[0];
+    free(genemapStrandString);
+    genemapStrandString = NULL;
 
+    if (genemapStrand != plusstrand && genemapStrand != minusstrand) {
+        fprintf(stderr, "***WARNING*** Trying to CSV format a variant call with an illegal gene mapping strand\n");
+        return;
+    }
+    
+    csv_formatter_variation_list_t *variationList = NULL;
+    if (csvFormatter->variationListsCount > 0) {
+        variationList = csvFormatter->variationLists[csvFormatter->variationListsCount - 1];
+    }
+    
+    if (variationList == NULL || variationList->position != genemapPosition) {
+        if (csvFormatter->variationListsCount == csvFormatter->variationListsAllocated) {
+            csvFormatter->variationListsAllocated *= 2;
+            csvFormatter->variationLists = realloc(csvFormatter->variationLists, csvFormatter->variationListsAllocated);
+            memset(csvFormatter->variationLists + csvFormatter->variationListsCount, 0,
+                   sizeof(csv_formatter_variation_list_t *) * (csvFormatter->variationListsAllocated - csvFormatter->variationListsCount));
+        }
+        csvFormatter->variationListsCount++;
+        csvFormatter->variationLists[csvFormatter->variationListsCount - 1] = csv_formatter_variation_list_init(csvFormatter->sampleCount + 1, genemapPosition);
+        variationList = csvFormatter->variationLists[csvFormatter->variationListsCount - 1];
+    }
+    
+    int *genotypesArray = NULL;
+    int genotypesCount = 0;
+    int genotypesArrayLength = 0;
+    
+    genotypesCount = bcf_get_genotypes(header, record, &genotypesArray, &genotypesArrayLength);
+    if (genotypesCount < 0) {
+        fprintf(stderr, "Error getting genotypes\n");
+        free(genotypesArray);
+        exit(1);
+    }
+    if (genotypesCount != csvFormatter->sampleCount) {
+        fprintf(stderr, "***WARNING*** Not diploid\n");
+        free(genotypesArray);
+        return;
+    }
+    
+    csv_formatter_variation_list_add(variationList, record->d.allele[0], 0);
+    
+    int i;
+    for (i = 0; i < csvFormatter->sampleCount / 2; i++) {
+        int genotypeIndex1 = genotypesArray[i*2];
+        int genotypeIndex2 = genotypesArray[(i*2)+1];
+        const char *genotype1 = NULL;
+        const char *genotype2 = NULL;
+        if (genotypeIndex1 == bcf_gt_missing) {
+            genotype1 = "n";
+        } else if (genotypeIndex1 == bcf_int32_vector_end) {
+            genotype1 = "-";
+        } else {
+            genotype1 = record->d.allele[bcf_gt_allele(genotypeIndex1)];
+        }
+        if (genotypeIndex2 == bcf_gt_missing) {
+            genotype2 = "n";
+        } else if (genotypeIndex2 == bcf_int32_vector_end) {
+            genotype1 = "-";
+        } else {
+            genotype2 = record->d.allele[bcf_gt_allele(genotypeIndex2)];
+        }
+        
+        char *genotype1Complement = NULL;
+        char *genotype2Complement = NULL;
+        if (genemapStrand == minusstrand) {
+            genotype1Complement = malloc(strlen(genotype1) + 1);
+            strcpy(genotype1Complement, complement_nucleotide_sequence(genotype1));
+            genotype1 = genotype1Complement;
+            genotype2Complement = malloc(strlen(genotype2) + 1);
+            strcpy(genotype2Complement, complement_nucleotide_sequence(genotype2));
+            genotype2 = genotype2Complement;
+        }
+        
+        char *concat_genotype = NULL;
+        if (bcf_gt_is_phased(genotypeIndex2) == 0) {
+            concat_genotype = malloc(strlen(genotype1) + strlen(genotype2) + 5);
+            sprintf(concat_genotype, "(%s, %s)", genotype1, genotype2);
+            genotype1 = concat_genotype;
+            genotype2 = concat_genotype;
+        }
+        
+        csv_formatter_variation_list_add(variationList, genotype1, (i*2)+1); // +1 because of reference genome
+        csv_formatter_variation_list_add(variationList, genotype1, (i*2)+2); // +1 because of reference genome
+        
+        free(concat_genotype);
+        free(genotype1Complement);
+        free(genotype2Complement);
+    }
+    
+    free(genotypesArray);
+}
 
+void csv_formatter_print(csv_formatter_t* csvFormatter, FILE *fp)
+{
+    int i;
+    int j;
+    
+    fprintf(fp, "Sample");
+    for (i = 0; i< csvFormatter->variationListsCount; i++) {
+        fprintf(fp, "\t%d", (int)csvFormatter->variationLists[i]->position);
+    }
+    fprintf(fp, "\n");
+
+    fprintf(fp, "%s", csvFormatter->referenceSample->sampleName);
+    for (i = 0; i < csvFormatter->variationListsCount; i++) {
+        fprintf(fp, "\t%s", csvFormatter->variationLists[i]->variations[0]);
+    }
+    fprintf(fp, "\n");
+    
+    for (i = 0; i < csvFormatter->sampleCount; i++) {
+        fprintf(fp, "%s (%d)", csvFormatter->samples[i]->sampleName, csvFormatter->samples[i]->allele);
+        for (j = 0; j < csvFormatter->variationListsCount; j++) {
+            fprintf(fp, "\t%s", csvFormatter->variationLists[j]->variations[i+1]);
+        }
+        fprintf(fp, "\n");
+    }
+}
 
 
 
