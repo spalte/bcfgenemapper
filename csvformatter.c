@@ -287,7 +287,7 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         }
         
         csv_formatter_variation_list_add(variationList, genotype1, (i*2)+1); // +1 because of reference genome
-        csv_formatter_variation_list_add(variationList, genotype1, (i*2)+2); // +1 because of reference genome
+        csv_formatter_variation_list_add(variationList, genotype2, (i*2)+2); // +1 because of reference genome
         
         free(concat_genotype);
         free(genotype1Complement);

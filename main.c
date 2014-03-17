@@ -58,7 +58,7 @@ void print_usage (FILE* stream, int exit_code)
 {
     fprintf(stream, "Gene Mapper (%s, htslib version:%s)\n", BCFGENEMAPPER_VERSION, hts_version());
     fprintf(stream, "Copyright (c) 2014, Spaltenstein Natural Image\n");
-    fprintf(stream, "Usage:  %s <-e exon_filename> [options] [input_filename]\n", program_name);
+    fprintf(stream, "Usage:  %s [options] [input_filename]\n", program_name);
     fprintf(stream,
             "  -h  --help                 Display this usage information.\n"
             "  -o  --output filename      Write output to file.\n"
@@ -69,9 +69,13 @@ void print_usage (FILE* stream, int exit_code)
             "  -v  --verbose              Print verbose messages.\n\n"
             "  -s  --strip                Don't output variants that are not in exons.\n"
             "  -v  --verbose              Print verbose messages.\n\n"
-            "If the input or output filenames are omitted %s will use\n"
-            "stdin and stdout respectively\n\n", program_name);
-    fprintf(stream,
+            
+            "If the input file does not have Gene Mapper information, an exon range file\n"
+            "must be provided.\n\n"
+            
+            "If the input file is not specified stdin will be used.\n"
+            "Use '-' as the output file to specify stdout.\n\n"
+
             "The format of the exon range file is: \"(start_position) (end_position)newLine\"\n"
             "Both start and end are inclusive and 0-indexed (like in NCBI XML files).\n"
             "If the exon is on the (-)strand, the start should be a larger index than\n"
@@ -174,76 +178,97 @@ int main(int argc, char * const *argv)
         print_usage(stdout, 1);
     }
     
-    if (exons_filename == NULL) {
-        fprintf(stderr, "No exon file specified. Use -e to specify the exon file.\n");
-        print_usage(stderr, 1);
+    gene_mapper_t *geneMapper = NULL;
+    FILE *exonFp = NULL;
+    if (exons_filename) {
+        exonFp = fopen(exons_filename, "r");
+        if (exonFp < 0) {
+            fprintf(stderr, "Unable to open exon file. \"%s\".\n", exons_filename);
+            print_usage(stderr, 1);
+        }
+        geneMapper = gene_mapper_file_init(exonFp);
+        if (gene_mapper_exon_count(geneMapper) == 0) {
+            fprintf(stderr, "Unable to read exons from file \"%s\".\n", exons_filename);
+            print_usage(stderr, 1);
+        }
+        fclose(exonFp);
+        exonFp = NULL;
     }
-    
-    FILE *exonFp = fopen(exons_filename, "r");
-    if (exonFp < 0) {
-        fprintf(stderr, "Unable to open exon file. \"%s\".", exons_filename);
-        print_usage(stderr, 1);
-    }
-    
-    gene_mapper_t *geneMapper = gene_mapper_file_init(exonFp);
-    if (gene_mapper_exon_count(geneMapper) == 0) {
-        fprintf(stderr, "Unable to read exons from file \"%s\".", exons_filename);
-        print_usage(stderr, 1);
-    }
-    fclose(exonFp);
-    exonFp = NULL;
     
     if (input_filename == NULL) {
         input_filename = "-";
     }
-    if (output_filename == NULL) {
-        output_filename = "-";
+    
+    if (output_filename == NULL && csv_filename == NULL) {
+        fprintf(stderr, "Nothing to do! Specify an output file or CSV output file.\n");
+        print_usage(stderr, 1);
     }
     
     htsFile *htsInFile = hts_open(input_filename, "r");
     if (htsInFile < 0) {
-        fprintf(stderr, "Unable to open input file \"%s\".", input_filename);
+        fprintf(stderr, "Unable to open input file \"%s\".\n", input_filename);
         print_usage(stderr, 1);
+    }
+    
+    bcf_hdr_t *bcf_header = bcf_hdr_read(htsInFile);
+    if (bcf_header == NULL) {
+        fprintf(stderr, "Unable to read the header from input file \"%s\".\n", input_filename);
+        print_usage(stderr, 1);
+    }
+    
+    if (geneMapper == NULL) {
+        int headerTextLength;
+        char *headerText = bcf_hdr_fmt_text(bcf_header, 0, &headerTextLength);
+        if (strstr(headerText, GENEMAP_INFO_HEADER) == NULL || strstr(headerText, GENEMAP_STRAND_INFO_HEADER) == NULL) {
+            fprintf(stderr, "The input file \"%s\" does not have Gene Map information. \nPlease provide an exon file with the -e option.\n", input_filename);
+            print_usage(stderr, 1);
+        }
+
+        free(headerText);
     }
     
     char outputFileMode[3] = {'w', 'v', 0};
     if (output_type) {
         outputFileMode[1] = output_type[0];
     }
-    htsFile *vcfOutFile = hts_open(output_filename, outputFileMode);
-    if (htsInFile < 0) {
-        fprintf(stderr, "Unable to open output file \"%s\".", output_filename);
-        print_usage(stderr, 1);
+    htsFile *vcfOutFile = NULL;
+    if (output_filename) {
+        vcfOutFile = hts_open(output_filename, outputFileMode);
+        if (htsInFile == NULL) {
+            fprintf(stderr, "Unable to open output file \"%s\".\n", output_filename);
+            print_usage(stderr, 1);
+        }
     }
     
     FILE *csvFp = NULL;
     if (csv_filename) {
         csvFp = fopen(csv_filename, "w");
-        if (csvFp < 0) {
-            fprintf(stderr, "Unable to create csv file. \"%s\".", csv_filename);
+        if (csvFp == NULL) {
+            fprintf(stderr, "Unable to create csv file. \"%s\".\n", csv_filename);
             print_usage(stderr, 1);
         }
     }
     
-    if (verbose_flag) {
+    if (verbose_flag && geneMapper) {
         gene_mapper_print_exons(geneMapper, stdout);
     }
 
-    bcf_hdr_t *bcf_header = bcf_hdr_read(htsInFile);
     bcf_hdr_t *hdr_out = bcf_hdr_dup(bcf_header);
     
     int error = bcf_hdr_append(hdr_out, GENEMAP_INFO_HEADER);
     if (error) {
-        fprintf(stderr, "bcf_hdr_append error %d", error);
+        fprintf(stderr, "bcf_hdr_append error %d\n", error);
         abort();
     }
     error = bcf_hdr_append(hdr_out, GENEMAP_STRAND_INFO_HEADER);
     if (error) {
-        fprintf(stderr, "bcf_hdr_append error %d", error);
+        fprintf(stderr, "bcf_hdr_append error %d\n", error);
         abort();
     }
 
-    bcf_hdr_write(vcfOutFile, hdr_out);
+    if (vcfOutFile) {
+        bcf_hdr_write(vcfOutFile, hdr_out);
+    }
     
     csv_formatter_t *csvFormatter = NULL;
     if (csvFp) {
@@ -258,23 +283,35 @@ int main(int argc, char * const *argv)
     while (bcf_read(htsInFile, bcf_header, bcf_record)>=0 )
     {
         exon_range_t exon;
-        int32_t geneLocation = gene_mapper_map_position(geneMapper, bcf_record->pos, &exon);
+        if (geneMapper) {
+            int32_t geneLocation = gene_mapper_map_position(geneMapper, bcf_record->pos, &exon);
         
-        if (geneLocation >= 0) {
-            bcf_update_genemapper_info(hdr_out, bcf_record, geneLocation, exon_range_strand(exon));
-            updatedRecords++;
-            bcf_write(vcfOutFile, hdr_out, bcf_record);
-            keptRecords++;
-            
+            if (geneLocation >= 0) {
+                bcf_update_genemapper_info(hdr_out, bcf_record, geneLocation, exon_range_strand(exon));
+                updatedRecords++;
+            }
+        }
+        
+        int32_t *genemapPositionArray = NULL;
+        int genemapPositionArrayLength = 0;
+        int genemapPositionCount = 0;
+        genemapPositionCount = bcf_get_info_int32(hdr_out, bcf_record, GENEMAP, &genemapPositionArray, &genemapPositionArrayLength);
+        
+        if (genemapPositionCount > 0) {
             if (csvFp) {
                 csv_formatter_add_record(csvFormatter, hdr_out, bcf_record);
             }
-        } else if (strip_flag == 0) {
+            if (vcfOutFile) {
+                bcf_write(vcfOutFile, hdr_out, bcf_record);
+                keptRecords++;
+            }
+        } else if (strip_flag == 0 && vcfOutFile) {
             bcf_write(vcfOutFile, hdr_out, bcf_record);
             keptRecords++;
         } else {
             removedRecords++;
         }
+        free(genemapPositionArray);
     }
     
     if (csvFp) {
@@ -283,7 +320,7 @@ int main(int argc, char * const *argv)
         csvFp = NULL;
     }
     
-    if (verbose_flag) {
+    if (vcfOutFile && verbose_flag) {
         printf("%d record%s kept.\n", (int)keptRecords, keptRecords != 1?"s":"");
         printf("%d record%s updated.\n", (int)updatedRecords, updatedRecords != 1?"s":"");
         printf("%d record%s removed.\n", (int)removedRecords, removedRecords != 1?"s":"");
@@ -291,11 +328,15 @@ int main(int argc, char * const *argv)
     
     hts_close(htsInFile);
     htsInFile = NULL;
-    hts_close(vcfOutFile);
-    vcfOutFile = NULL;
+    if (vcfOutFile) {
+        hts_close(vcfOutFile);
+        vcfOutFile = NULL;
+    }
 
-    gene_mapper_destroy(geneMapper);
-    geneMapper = NULL;
+    if (geneMapper) {
+        gene_mapper_destroy(geneMapper);
+        geneMapper = NULL;
+    }
     
     bcf_hdr_destroy(bcf_header);
     bcf_header = NULL;
