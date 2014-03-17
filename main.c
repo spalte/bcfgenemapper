@@ -65,7 +65,8 @@ void print_usage (FILE* stream, int exit_code)
             "  -O  --output-type b|u|z|v  Compressed BCF (b), Uncompressed BCF (u),\n"
             "                             Compressed VCF (z), Uncompressed VCF (v).\n"
             "  -e  --exons filename       Read exon ranges from this file.\n"
-            "  -c  --csv filename         Write variants to a cvs file. Positions are 1-indexed.\n"
+            "  -c  --csv filename         Write variants to a cvs file.\n"
+            "                             Positions in the csv file are 1-indexed.\n"
             "  -v  --verbose              Print verbose messages.\n\n"
             "  -s  --strip                Don't output variants that are not in exons.\n"
             "  -v  --verbose              Print verbose messages.\n\n"
@@ -73,7 +74,7 @@ void print_usage (FILE* stream, int exit_code)
             "If the input file does not have Gene Mapper information, an exon range file\n"
             "must be provided.\n\n"
             
-            "If the input file is not specified stdin will be used.\n"
+            "If the input file is not specified, stdin will be used.\n"
             "Use '-' as the output file to specify stdout.\n\n"
 
             "The format of the exon range file is: \"(start_position) (end_position)newLine\"\n"
