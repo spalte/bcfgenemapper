@@ -62,7 +62,7 @@ void print_usage (FILE* stream, int exit_code)
     fprintf(stream, "Usage:  %s [options] [input_filename]\n", program_name);
     fprintf(stream,
             "  -h  --help                 Display this usage information.\n"
-            "  -o  --output filename      Write output to file.\n"
+            "  -o  --output filename      Write output with Gene Map info to filename.\n"
             "  -O  --output-type b|u|z|v  Compressed BCF (b), Uncompressed BCF (u),\n"
             "                             Compressed VCF (z), Uncompressed VCF (v).\n"
             "  -e  --exons filename       Read exon ranges from this file.\n"
@@ -338,6 +338,11 @@ int main(int argc, char * const *argv)
     if (geneMapper) {
         gene_mapper_destroy(geneMapper);
         geneMapper = NULL;
+    }
+    
+    if (csvFormatter) {
+        csv_formatter_destroy(csvFormatter);
+        csvFormatter = NULL;
     }
     
     bcf_hdr_destroy(bcf_header);
