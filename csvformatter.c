@@ -281,16 +281,12 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         char *genotype1Complement = NULL;
         char *genotype2Complement = NULL;
         if (genemapStrand == minusstrand) {
-            printf("genotype1 = %s\n", genotype1);
-            printf("genotype2 = %s\n", genotype2);
             genotype1Complement = malloc(strlen(genotype1) + 1);
             strcpy(genotype1Complement, complement_nucleotide_sequence(genotype1));
             genotype1 = genotype1Complement;
             genotype2Complement = malloc(strlen(genotype2) + 1);
             strcpy(genotype2Complement, complement_nucleotide_sequence(genotype2));
             genotype2 = genotype2Complement;
-            printf("complement genotype1 = %s\n", genotype1);
-            printf("complement genotype2 = %s\n", genotype2);
         }
         
         char *concat_genotype = NULL;
