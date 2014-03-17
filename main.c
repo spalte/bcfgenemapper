@@ -62,7 +62,7 @@ void print_usage (FILE* stream, int exit_code)
     fprintf(stream, "Usage:  %s [options] [input_filename]\n", program_name);
     fprintf(stream,
             "  -h  --help                 Display this usage information.\n"
-            "  -o  --output filename      Write output with Gene Map info to filename.\n"
+            "  -o  --output filename      Write output with Gene Mapper info to filename.\n"
             "  -O  --output-type b|u|z|v  Compressed BCF (b), Uncompressed BCF (u),\n"
             "                             Compressed VCF (z), Uncompressed VCF (v).\n"
             "  -e  --exons filename       Read exon ranges from this file.\n"
@@ -222,7 +222,7 @@ int main(int argc, char * const *argv)
         int headerTextLength;
         char *headerText = bcf_hdr_fmt_text(bcf_header, 0, &headerTextLength);
         if (strstr(headerText, GENEMAP_INFO_HEADER) == NULL || strstr(headerText, GENEMAP_STRAND_INFO_HEADER) == NULL) {
-            fprintf(stderr, "The input file \"%s\" does not have Gene Map information. \nPlease provide an exon file with the -e option.\n", input_filename);
+            fprintf(stderr, "The input file \"%s\" does not have Gene Mapper information. \nPlease provide an exon file with the -e option.\n", input_filename);
             print_usage(stderr, 1);
         }
 
