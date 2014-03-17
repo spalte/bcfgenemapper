@@ -7,6 +7,7 @@
 //
 
 #include <stdio.h>
+#include <ctype.h>
 #include <htslib/vcf.h>
 #include <getopt.h>
 
@@ -377,7 +378,14 @@ char complement_nucleotide(char n)
         case '-':
             return '-';
         default:
-            return 0;
+            if (!isspace(n) && !ispunct(n)) {
+                if (isprint(n)) {
+                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide %c\n", n);
+                } else {
+                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide ASCII value %d\n", (int)n);
+                }
+            }
+            return n;
         }
 }
 

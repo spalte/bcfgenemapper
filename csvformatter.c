@@ -244,7 +244,18 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         return;
     }
     
-    csv_formatter_variation_list_add(variationList, record->d.allele[0], 0);
+    // add reference variant
+    char *referenceVariation = record->d.allele[0];
+    char *referenceVariationComplement = NULL;
+    
+    if (genemapStrand == minusstrand) {
+        referenceVariationComplement = malloc(strlen(referenceVariation) + 1);
+        strcpy(referenceVariationComplement, complement_nucleotide_sequence(referenceVariation));
+        referenceVariation = referenceVariationComplement;
+    }
+    
+    csv_formatter_variation_list_add(variationList, referenceVariation, 0);
+    free(referenceVariationComplement);
     
     int i;
     for (i = 0; i < csvFormatter->sampleCount / 2; i++) {
@@ -270,12 +281,16 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         char *genotype1Complement = NULL;
         char *genotype2Complement = NULL;
         if (genemapStrand == minusstrand) {
+            printf("genotype1 = %s\n", genotype1);
+            printf("genotype2 = %s\n", genotype2);
             genotype1Complement = malloc(strlen(genotype1) + 1);
             strcpy(genotype1Complement, complement_nucleotide_sequence(genotype1));
             genotype1 = genotype1Complement;
             genotype2Complement = malloc(strlen(genotype2) + 1);
             strcpy(genotype2Complement, complement_nucleotide_sequence(genotype2));
             genotype2 = genotype2Complement;
+            printf("complement genotype1 = %s\n", genotype1);
+            printf("complement genotype2 = %s\n", genotype2);
         }
         
         char *concat_genotype = NULL;
