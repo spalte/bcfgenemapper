@@ -149,7 +149,7 @@ int main(int argc, char * const *argv)
             case 'O':
                 output_type = optarg;
                 if (validate_output_type(output_type) == 0) {
-                    fprintf(stderr, "Invalid output type: \"%s\", legal values are b|u|z|v\n", output_type);
+                    fprintf(stderr, "Invalid output type: \"%s\", legal values are b|u|z|v.\n", output_type);
                     print_usage(stderr, 1);
                 }
                 break;
@@ -163,7 +163,7 @@ int main(int argc, char * const *argv)
                 print_usage(stdout, 1);
                 break;
             default:
-                fprintf(stderr, "about to abort because c = %d, %c\n", c, (char)c);
+                fprintf(stderr, "about to abort because c = %d, %c.\n", c, (char)c);
                 abort();
         }
     }
