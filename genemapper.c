@@ -138,7 +138,11 @@ void gene_mapper_print_exons(gene_mapper_t* geneMapper, FILE *fp)
     for (i = 0; i < geneMapper->exonCount; i++) {
         exon_range_t exon = geneMapper->exons[i];
         fprintf(fp, "    %8d  %8d ", (int)exon.start, (int)exon.end);
-        fprintf(fp, "  Length: %5d  (%c)strand\n", (int)(exon.end - exon.start) + 1, exon_range_strand(exon));
+        if (exon_range_strand(exon) == plusstrand) {
+            fprintf(fp, "  Length: %5d  (%c)strand\n", (int)(exon.end - exon.start) + 1, exon_range_strand(exon));
+        } else {
+            fprintf(fp, "  Length: %5d  (%c)strand\n", (int)(exon.start - exon.end) + 1, exon_range_strand(exon));
+        }
     }
 }
 

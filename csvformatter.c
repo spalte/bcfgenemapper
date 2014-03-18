@@ -140,7 +140,6 @@ void csv_formatter_sort_variant_lists(csv_formatter_t* csvFormatter)
     qsort(csvFormatter->variationLists, csvFormatter->variationListsCount, sizeof(csv_formatter_variation_list_t *), compare_variant_lists);
 }
 
-
 void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, bcf1_t *record)
 {
     if (bcf_is_snp(record) == 0) { // only handle SNPs for now

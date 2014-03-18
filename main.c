@@ -54,8 +54,23 @@ int bcf_update_genemapper_info(const bcf_hdr_t *hdr, bcf1_t *line, int32_t index
     return 0;
 }
 
+// returns 0 on success
+int bcf_remove_genemapper_info(const bcf_hdr_t *hdr, bcf1_t *line)
+{
+    int error = 0;
+    error = bcf_update_info_int32(hdr, line, GENEMAP, NULL, 0);
+    if (error) {
+        return error;
+    }
+    error = bcf_update_info(hdr, line, GENEMAP_STRAND, NULL, 0, BCF_HT_STR);
+    if (error) {
+        return error;
+    }
+    return 0;
+}
 
-void print_usage (FILE* stream, int exit_code)
+
+void print_usage(FILE* stream, int exit_code)
 {
     fprintf(stream, "Gene Mapper (%s, htslib version:%s)\n", BCFGENEMAPPER_VERSION, hts_version());
     fprintf(stream, "Copyright (c) 2014, Spaltenstein Natural Image\n");
@@ -66,9 +81,8 @@ void print_usage (FILE* stream, int exit_code)
             "  -O  --output-type b|u|z|v  Compressed BCF (b), Uncompressed BCF (u),\n"
             "                             Compressed VCF (z), Uncompressed VCF (v).\n"
             "  -e  --exons filename       Read exon ranges from this file.\n"
-            "  -c  --csv filename         Write variants to a cvs file.\n"
+            "  -c  --csv filename         Write variants to a csv file.\n"
             "                             Positions in the csv file are 1-indexed.\n"
-            "  -v  --verbose              Print verbose messages.\n\n"
             "  -s  --strip                Don't output variants that are not in exons.\n"
             "  -v  --verbose              Print verbose messages.\n\n"
             
@@ -149,7 +163,7 @@ int main(int argc, char * const *argv)
             case 'O':
                 output_type = optarg;
                 if (validate_output_type(output_type) == 0) {
-                    fprintf(stderr, "Invalid output type: \"%s\", legal values are b|u|z|v.\n", output_type);
+                    fprintf(stderr, "Invalid output type: '%s', legal values are b|u|z|v.\n", output_type);
                     print_usage(stderr, 1);
                 }
                 break;
@@ -288,9 +302,18 @@ int main(int argc, char * const *argv)
         if (geneMapper) {
             int32_t geneLocation = gene_mapper_map_position(geneMapper, bcf_record->pos, &exon);
         
+            int error;
             if (geneLocation >= 0) {
-                bcf_update_genemapper_info(hdr_out, bcf_record, geneLocation, exon_range_strand(exon));
+                error = bcf_update_genemapper_info(hdr_out, bcf_record, geneLocation, exon_range_strand(exon));
+                if (error < 0) {
+                    fprintf(stderr, "***WARNING*** Error updating Gene Mapper info\n");
+                }
                 updatedRecords++;
+            } else {
+                error = bcf_remove_genemapper_info(hdr_out, bcf_record);
+                if (error < 0) {
+                    fprintf(stderr, "***WARNING*** Error removing Gene Mapper info\n");
+                }
             }
         }
         
