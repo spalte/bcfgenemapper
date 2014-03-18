@@ -306,13 +306,13 @@ int main(int argc, char * const *argv)
             if (geneLocation >= 0) {
                 error = bcf_update_genemapper_info(hdr_out, bcf_record, geneLocation, exon_range_strand(exon));
                 if (error < 0) {
-                    fprintf(stderr, "***WARNING*** Error updating Gene Mapper info\n");
+                    fprintf(stderr, "***WARNING*** Error updating Gene Mapper info.\n");
                 }
                 updatedRecords++;
             } else {
                 error = bcf_remove_genemapper_info(hdr_out, bcf_record);
                 if (error < 0) {
-                    fprintf(stderr, "***WARNING*** Error removing Gene Mapper info\n");
+                    fprintf(stderr, "***WARNING*** Error removing Gene Mapper info.\n");
                 }
             }
         }
@@ -406,9 +406,9 @@ char complement_nucleotide(char n)
         default:
             if (!isspace(n) && !ispunct(n)) {
                 if (isprint(n)) {
-                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide '%c'\n", n);
+                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide '%c'.\n", n);
                 } else {
-                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide ASCII value %d\n", (int)n);
+                    fprintf(stderr, "***WARNING*** Trying to get the complement of unknown nucleotide ASCII value %d.\n", (int)n);
                 }
             }
             return n;
