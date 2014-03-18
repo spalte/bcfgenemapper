@@ -184,13 +184,13 @@ int main(int argc, char * const *argv)
     FILE *exonFp = NULL;
     if (exons_filename) {
         exonFp = fopen(exons_filename, "r");
-        if (exonFp < 0) {
-            fprintf(stderr, "Unable to open exon file. \"%s\".\n", exons_filename);
+        if (exonFp == NULL) {
+            fprintf(stderr, "Unable to open exon file. '%s'.\n", exons_filename);
             print_usage(stderr, 1);
         }
         geneMapper = gene_mapper_file_init(exonFp);
         if (gene_mapper_exon_count(geneMapper) == 0) {
-            fprintf(stderr, "Unable to read exons from file \"%s\".\n", exons_filename);
+            fprintf(stderr, "Unable to read exons from file '%s'.\n", exons_filename);
             print_usage(stderr, 1);
         }
         fclose(exonFp);
@@ -207,14 +207,14 @@ int main(int argc, char * const *argv)
     }
     
     htsFile *htsInFile = hts_open(input_filename, "r");
-    if (htsInFile < 0) {
-        fprintf(stderr, "Unable to open input file \"%s\".\n", input_filename);
+    if (htsInFile == NULL) {
+        fprintf(stderr, "Unable to open input file '%s'.\n", input_filename);
         print_usage(stderr, 1);
     }
     
     bcf_hdr_t *bcf_header = bcf_hdr_read(htsInFile);
     if (bcf_header == NULL) {
-        fprintf(stderr, "Unable to read the header from input file \"%s\".\n", input_filename);
+        fprintf(stderr, "Unable to read the header from input file '%s'.\n", input_filename);
         print_usage(stderr, 1);
     }
     
@@ -222,7 +222,7 @@ int main(int argc, char * const *argv)
         int headerTextLength;
         char *headerText = bcf_hdr_fmt_text(bcf_header, 0, &headerTextLength);
         if (strstr(headerText, GENEMAP_INFO_HEADER) == NULL || strstr(headerText, GENEMAP_STRAND_INFO_HEADER) == NULL) {
-            fprintf(stderr, "The input file \"%s\" does not have Gene Mapper information. \nPlease provide an exon file with the -e option.\n", input_filename);
+            fprintf(stderr, "The input file '%s' does not have Gene Mapper information. \nPlease provide an exon file with the -e option.\n", input_filename);
             print_usage(stderr, 1);
         }
 
@@ -237,7 +237,7 @@ int main(int argc, char * const *argv)
     if (output_filename) {
         vcfOutFile = hts_open(output_filename, outputFileMode);
         if (htsInFile == NULL) {
-            fprintf(stderr, "Unable to open output file \"%s\".\n", output_filename);
+            fprintf(stderr, "Unable to open output file '%s'.\n", output_filename);
             print_usage(stderr, 1);
         }
     }
@@ -246,7 +246,7 @@ int main(int argc, char * const *argv)
     if (csv_filename) {
         csvFp = fopen(csv_filename, "w");
         if (csvFp == NULL) {
-            fprintf(stderr, "Unable to create csv file. \"%s\".\n", csv_filename);
+            fprintf(stderr, "Unable to create csv file. '%s'.\n", csv_filename);
             print_usage(stderr, 1);
         }
     }
