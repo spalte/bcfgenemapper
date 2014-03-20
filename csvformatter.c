@@ -230,7 +230,7 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
     
     if (csvFormatter->variationListsCount == csvFormatter->variationListsAllocated) {
         csvFormatter->variationListsAllocated *= 2;
-        csvFormatter->variationLists = realloc(csvFormatter->variationLists, sizeof(csv_formatter_variation_list_t *) * csvFormatter->variationListsAllocated);
+        csvFormatter->variationLists = (csv_formatter_variation_list_t **)realloc(csvFormatter->variationLists, sizeof(csv_formatter_variation_list_t *) * csvFormatter->variationListsAllocated);
         memset(csvFormatter->variationLists + csvFormatter->variationListsCount, 0,
                sizeof(csv_formatter_variation_list_t *) * (csvFormatter->variationListsAllocated - csvFormatter->variationListsCount));
     }

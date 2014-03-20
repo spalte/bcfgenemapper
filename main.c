@@ -451,7 +451,7 @@ const char *complement_nucleotide_sequence(const char *sequence)
     int complementSequenceLength = 0;
     
     if (strlen(sequence) + 1 >= complementSequenceLength) {
-        complementSequence = realloc(complementSequence, strlen(sequence) + 1);
+        complementSequence = (char *)realloc(complementSequence, strlen(sequence) + 1);
     }
     
     int i;

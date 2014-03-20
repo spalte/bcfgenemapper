@@ -51,7 +51,7 @@ gene_mapper_t *gene_mapper_file_init(FILE *fp)
 void gene_mapper_add_exon(gene_mapper_t* geneMapper, exon_range_t exon)
 {
     if (geneMapper->exonCount == geneMapper->exonsAllocated) {
-        geneMapper->exons = realloc(geneMapper->exons, sizeof(exon_range_t) * (geneMapper->exonsAllocated * 2));
+        geneMapper->exons = (exon_range_t *)realloc(geneMapper->exons, sizeof(exon_range_t) * (geneMapper->exonsAllocated * 2));
         geneMapper->exonsAllocated *= 2;
         memset(geneMapper->exons + geneMapper->exonCount, 0, sizeof(exon_range_t) * (geneMapper->exonsAllocated - geneMapper->exonCount));
     }
