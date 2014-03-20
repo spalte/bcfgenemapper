@@ -9,7 +9,7 @@ include $(HTSDIR)/htslib.mk
 HTSLIB = $(HTSDIR)/libhts.a
 
 CC=			gcc
-CFLAGS=		-g -Wall -Wc++-compat -O2
+CFLAGS=		-g -Wall -Wc++-compat -O0
 DFLAGS=
 OBJS=		main.o genemapper.o csvformatter.o
 INCLUDES=	-I. -I$(HTSDIR)
