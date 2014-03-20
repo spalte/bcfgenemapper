@@ -66,13 +66,20 @@ gene_mapper_t *gene_mapper_file_init(FILE *fp)
     
     newGeneMapper->referenceGenome = (char *)malloc(sequenceLength + 1);
 
-#warning dynamically allocate essential position array length
-    newGeneMapper->essentialPositions = (int32_t *)malloc(sizeof(int32_t) * 1000);
-    memset(newGeneMapper->essentialPositions, 0, sizeof(int32_t) * 1000);
     
     fscanf(fp, "%s\n", newGeneMapper->referenceGenome);
-
+    
+    long essentialPositionsFilePoss = ftell(fp);
+    int32_t essentialPositionCount = 0;
     int position = 0;
+    while (fscanf(fp, "%d\n", &position) == 1) {
+        essentialPositionCount++;
+    }
+    fseek(fp, essentialPositionsFilePoss, SEEK_SET);
+
+    newGeneMapper->essentialPositions = (int32_t *)malloc(sizeof(int32_t) * essentialPositionCount);
+    memset(newGeneMapper->essentialPositions, 0, sizeof(int32_t) * essentialPositionCount);
+
     for (newGeneMapper->essentialPositionCount = 0; fscanf(fp, "%d\n", &position) == 1;) {
         newGeneMapper->essentialPositions[newGeneMapper->essentialPositionCount] = position;
         newGeneMapper->essentialPositionCount++;
