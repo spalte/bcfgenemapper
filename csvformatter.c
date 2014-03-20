@@ -135,6 +135,64 @@ static int compare_variant_lists(const void * variantList1Ptr, const void *varia
     }
 }
 
+void csv_formatter_collapse_variant_lists(csv_formatter_t* csvFormatter)
+{
+    csv_formatter_sort_variant_lists(csvFormatter);
+    
+    if (csvFormatter->variationListsCount == 0) {
+        return;
+    }
+    
+    csv_formatter_variation_list_t **collapsedVariationLists = (csv_formatter_variation_list_t **)malloc(sizeof(csv_formatter_variation_list_t *) * csvFormatter->variationListsCount);
+    memset(collapsedVariationLists, 0, sizeof(csv_formatter_variation_list_t *) * csvFormatter->variationListsCount);
+    collapsedVariationLists[0] = csvFormatter->variationLists[0];
+    
+    csv_formatter_variation_list_t *currentVariationList = csvFormatter->variationLists[0];
+    int i;
+    int j = 0;
+    for (i = 1; i < csvFormatter->variationListsCount; i++) {
+        if (csvFormatter->variationLists[i]->position != currentVariationList->position) {
+            j++;
+            collapsedVariationLists[j] = csvFormatter->variationLists[i];
+            currentVariationList = collapsedVariationLists[j];
+        } else {
+            int k;
+            if (strcmp(currentVariationList->variations[0], csvFormatter->variationLists[i]->variations[0]) == 0) {
+                for (k = 0; k < currentVariationList->variationsCount; k++) {
+                    if (currentVariationList->variations[k] == NULL || currentVariationList->variations[k] == emptyString) {
+                        currentVariationList->variations[k] = csvFormatter->variationLists[i]->variations[k];
+                    } else {
+                        if (csvFormatter->variationLists[i]->variations[k] != emptyString) {
+                            free((char *)csvFormatter->variationLists[i]->variations[k]);
+                        }
+                    }
+                }
+                free(csvFormatter->variationLists[i]);
+            } else {
+                const char *genomicNt = NULL;
+                const char *variantNt = NULL;
+                if (currentVariationList->variations[1] == NULL || currentVariationList->variations[1] == emptyString) {
+                    genomicNt = currentVariationList->variations[0];
+                    variantNt = csvFormatter->variationLists[i]->variations[0];
+                } else {
+                    variantNt = currentVariationList->variations[0];
+                    genomicNt = csvFormatter->variationLists[i]->variations[0];
+                }
+                j++;
+                collapsedVariationLists[j] = csvFormatter->variationLists[i];
+                currentVariationList = collapsedVariationLists[j];
+                fprintf(stderr, "***WARNING*** The Genomic Reference nucleotide at position %d '%s', is different from the Varient Call nucleotide '%s'.\n",
+                        (int)currentVariationList->position, genomicNt, variantNt);
+            }
+        }
+    }
+    
+    free(csvFormatter->variationLists);
+    csvFormatter->variationLists = collapsedVariationLists;
+    csvFormatter->variationListsAllocated = csvFormatter->variationListsCount;
+    csvFormatter->variationListsCount = j + 1;
+}
+
 void csv_formatter_sort_variant_lists(csv_formatter_t* csvFormatter)
 {
     qsort(csvFormatter->variationLists, csvFormatter->variationListsCount, sizeof(csv_formatter_variation_list_t *), compare_variant_lists);
@@ -343,9 +401,7 @@ void csv_formatter_print(csv_formatter_t* csvFormatter, FILE *fp)
     int i;
     int j;
     
-    csv_formatter_sort_variant_lists(csvFormatter);
-    
-#warning collapse duplicate nucleotides
+    csv_formatter_collapse_variant_lists(csvFormatter);
     
     fprintf(fp, "Sample");
     for (i = 0; i< csvFormatter->variationListsCount; i++) {

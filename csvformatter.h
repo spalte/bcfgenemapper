@@ -46,6 +46,7 @@ void csv_formatter_variation_list_add(csv_formatter_variation_list_t *variationL
 csv_formatter_t *csv_formatter_init(bcf_hdr_t *bcfHeader);
 void csv_formatter_destroy(csv_formatter_t* csvFormatter);
 
+void csv_formatter_collapse_variant_lists(csv_formatter_t* csvFormatter);
 void csv_formatter_sort_variant_lists(csv_formatter_t* csvFormatter);
 
 void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, bcf1_t *record);
