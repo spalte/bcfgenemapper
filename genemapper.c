@@ -9,7 +9,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "genemapper.h"
+
+int32_t exon_range_length(exon_range_t exon) {
+    if (exon_range_strand(exon) == plusstrand) {
+        return (exon.end - exon.start) + 1;
+    } else {
+        return (exon.start - exon.end) + 1;
+    }
+}
+
 
 gene_mapper_t *gene_mapper_init()
 {
@@ -47,15 +57,35 @@ gene_mapper_t *gene_mapper_file_init(FILE *fp)
     
     fscanf(fp, "Sequence:\n");
     
-#warning dynamically allocate array lengths
-    newGeneMapper->referenceGenome = (char *)malloc(2048);
-    newGeneMapper->essentialPositions = (int32_t *)malloc(sizeof(int32_t) * 100);
+    long sequenceFilePoss = ftell(fp);
+    int32_t sequenceLength = 0;
+    while (isspace(fgetc(fp)) == 0) {
+        sequenceLength++;
+    }
+    fseek(fp, sequenceFilePoss, SEEK_SET);
+    
+    newGeneMapper->referenceGenome = (char *)malloc(sequenceLength + 1);
+
+#warning dynamically allocate essential position array length
+    newGeneMapper->essentialPositions = (int32_t *)malloc(sizeof(int32_t) * 1000);
+    memset(newGeneMapper->essentialPositions, 0, sizeof(int32_t) * 1000);
     
     fscanf(fp, "%s\n", newGeneMapper->referenceGenome);
 
     int position = 0;
-    for (newGeneMapper->essentialPositionCount = 0; fscanf(fp, "%d\n", &position) == 1; newGeneMapper->essentialPositionCount++) {
+    for (newGeneMapper->essentialPositionCount = 0; fscanf(fp, "%d\n", &position) == 1;) {
         newGeneMapper->essentialPositions[newGeneMapper->essentialPositionCount] = position;
+        newGeneMapper->essentialPositionCount++;
+    }
+    
+    int32_t totalExonLength = 0;
+    int i = 0;
+    for (i = 0; i < newGeneMapper->exonCount; i++) {
+        totalExonLength += exon_range_length(newGeneMapper->exons[i]);
+    }
+    
+    if (strlen(newGeneMapper->referenceGenome) != totalExonLength) {
+        fprintf(stderr, "***WARNING*** The Genomic Reference sequence has a length of %d when the total length of the exons is %d.\n", (int)strlen(newGeneMapper->referenceGenome), (int)totalExonLength);
     }
     
     return newGeneMapper;
@@ -150,18 +180,15 @@ void gene_mapper_print_exons(gene_mapper_t* geneMapper, FILE *fp)
 
     fprintf(fp, "There %s %d exons in the exon file.\n", geneMapper->exonCount == 1?"is":"are", (int)geneMapper->exonCount);
     
+    int32_t totalLength = 0;
     for (i = 0; i < geneMapper->exonCount; i++) {
         exon_range_t exon = geneMapper->exons[i];
         fprintf(fp, "    %8d  %8d ", (int)exon.start, (int)exon.end);
-        if (exon_range_strand(exon) == plusstrand) {
-            fprintf(fp, "  Length: %5d  (%c)strand\n", (int)(exon.end - exon.start) + 1, exon_range_strand(exon));
-        } else {
-            fprintf(fp, "  Length: %5d  (%c)strand\n", (int)(exon.start - exon.end) + 1, exon_range_strand(exon));
-        }
+        fprintf(fp, "  Length: %5d  (%c)strand\n", exon_range_length(exon), exon_range_strand(exon));
+        totalLength += exon_range_length(exon);
     }
+    fprintf(fp, "Total Length: %d\n", totalLength);
 }
-
-
 
 
 

@@ -50,7 +50,7 @@ void csv_formatter_collapse_variant_lists(csv_formatter_t* csvFormatter);
 void csv_formatter_sort_variant_lists(csv_formatter_t* csvFormatter);
 
 void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, bcf1_t *record);
-void csv_formatter_add_postition(csv_formatter_t* csvFormatter, int32_t position, const char *referenceSequence);
+void csv_formatter_add_postition(csv_formatter_t* csvFormatter, int32_t position, const char *referenceNuceotide);
 void csv_formatter_print(csv_formatter_t* csvFormatter, FILE *fp);
 
 #endif

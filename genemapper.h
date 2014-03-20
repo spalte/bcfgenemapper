@@ -21,6 +21,7 @@ typedef struct { // exon range, start and end are inclusive
 
 static inline exon_range_t exon_range(int32_t start, int32_t end) {exon_range_t exon;exon.start = start; exon.end = end; return exon;}
 static inline strand_t exon_range_strand(exon_range_t exon) {return (exon.start <= exon.end)?plusstrand:minusstrand;}
+int32_t exon_range_length(exon_range_t exon);
 
 typedef struct {
     int32_t exonCount;

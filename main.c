@@ -371,8 +371,16 @@ int main(int argc, char * const *argv)
     if (csvFp) {
         if (geneMapper) {
             int i;
+            size_t sequenceLength = strlen(geneMapper->referenceGenome);
             for (i = 0; i < geneMapper->essentialPositionCount; i++) {
-                csv_formatter_add_postition(csvFormatter, geneMapper->essentialPositions[i], geneMapper->referenceGenome);
+                if (geneMapper->essentialPositions[i] >= sequenceLength) {
+                    fprintf(stderr, "[%s:%d %s] position %d out of bounds of the reference sequence\n", __FILE__, __LINE__, __FUNCTION__, geneMapper->essentialPositions[i]);
+                    continue;
+                }
+                
+                char nt[] = {0, 0};
+                nt[0] = geneMapper->referenceGenome[geneMapper->essentialPositions[i]-1];
+                csv_formatter_add_postition(csvFormatter, geneMapper->essentialPositions[i], nt);
             }
         }
 

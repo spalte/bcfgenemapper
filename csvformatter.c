@@ -380,19 +380,18 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
     free(genotypesArray);
 }
 
-void csv_formatter_add_postition(csv_formatter_t* csvFormatter, int32_t position, const char *referenceSequence)
+#include <signal.h>
+
+void csv_formatter_add_postition(csv_formatter_t* csvFormatter, int32_t position, const char *referenceNuceotide)
 {
-    csv_formatter_variation_list_t *variationList = csv_formatter_new_variation_list(csvFormatter, position);
-    
-    size_t sequenceLength = strlen(referenceSequence);
-    if (position >= sequenceLength) {
-        fprintf(stderr, "[%s:%d %s] position %d out of bounds of the reference sequence\n", __FILE__, __LINE__, __FUNCTION__, position);
-        abort();
+    if (position == 64) {
+        raise(SIGINT);
     }
     
-    char *nt = (char *)malloc(sizeof(char) + 1);
-    nt[0] = referenceSequence[position - 1];
-    nt[1] = 0;
+    csv_formatter_variation_list_t *variationList = csv_formatter_new_variation_list(csvFormatter, position);
+    
+    char *nt = (char *)malloc(strlen(referenceNuceotide) + 1);
+    strcpy(nt, referenceNuceotide);
     variationList->variations[0] = nt;
 }
 
