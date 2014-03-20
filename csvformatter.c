@@ -15,10 +15,10 @@ static const char *emptyString = "";
 
 csv_formatter_sample_t *csv_formatter_sample_init(const char *sampleName, char allele)
 {
-    csv_formatter_sample_t *newSample = malloc(sizeof(csv_formatter_sample_t));
+    csv_formatter_sample_t *newSample = (csv_formatter_sample_t *)malloc(sizeof(csv_formatter_sample_t));
     memset(newSample, 0, sizeof(csv_formatter_sample_t));
     
-    char *newSampleName = malloc(strlen(sampleName) + 1);;
+    char *newSampleName = (char *)malloc(strlen(sampleName) + 1);;
     strcpy(newSampleName, sampleName);
     newSample->sampleName = newSampleName;
     
@@ -36,11 +36,11 @@ void csv_formatter_sample_destroy(csv_formatter_sample_t* sample)
 
 csv_formatter_variation_list_t *csv_formatter_variation_list_init(int32_t sampleCount, int32_t position)
 {
-    csv_formatter_variation_list_t *newVariations = malloc(sizeof(csv_formatter_variation_list_t));
+    csv_formatter_variation_list_t *newVariations = (csv_formatter_variation_list_t *)malloc(sizeof(csv_formatter_variation_list_t));
     
     newVariations->position = position;
     newVariations->variationsCount = sampleCount;
-    newVariations->variations = malloc(sizeof(char *) * sampleCount);
+    newVariations->variations = (const char **)malloc(sizeof(char *) * sampleCount);
     int32_t i;
     for (i = 0; i < newVariations->variationsCount; i++) {
         newVariations->variations[i] = emptyString;
@@ -72,20 +72,20 @@ void csv_formatter_variation_list_add(csv_formatter_variation_list_t *variationL
         free((char *)variationList->variations[sampleIndex]);
     }
     
-    char *newVariation = malloc(strlen(variation) + 1);
+    char *newVariation = (char *)malloc(strlen(variation) + 1);
     strcpy(newVariation, variation);
     variationList->variations[sampleIndex] = newVariation;
 }
 
 csv_formatter_t *csv_formatter_init(bcf_hdr_t *bcfHeader)
 {
-    csv_formatter_t *newFormatter = malloc(sizeof(csv_formatter_t));
+    csv_formatter_t *newFormatter = (csv_formatter_t *)malloc(sizeof(csv_formatter_t));
     memset(newFormatter, 0, sizeof(csv_formatter_t));
 
     newFormatter->referenceSample = csv_formatter_sample_init("reference", 0);
     
     newFormatter->sampleCount = bcf_hdr_nsamples(bcfHeader) * 2;
-    newFormatter->samples = malloc(sizeof(csv_formatter_sample_t*) * bcf_hdr_nsamples(bcfHeader) * 2);
+    newFormatter->samples = (csv_formatter_sample_t **)malloc(sizeof(csv_formatter_sample_t*) * bcf_hdr_nsamples(bcfHeader) * 2);
     
     int i;
     for (i=0; i<bcf_hdr_nsamples(bcfHeader); i++)
@@ -97,8 +97,8 @@ csv_formatter_t *csv_formatter_init(bcf_hdr_t *bcfHeader)
     }
     
     newFormatter->variationListsAllocated = 1;
-    newFormatter->variationLists = malloc(sizeof(csv_formatter_variation_list_t *));
-    memset(newFormatter->variationLists, 0, sizeof(csv_formatter_variation_list_t *));
+    newFormatter->variationLists = (csv_formatter_variation_list_t **)malloc(sizeof(csv_formatter_variation_list_t *));
+    memset(newFormatter->variationLists, 0, sizeof(csv_formatter_variation_list_t **));
     
     return newFormatter;
 }
@@ -259,7 +259,7 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
     char *referenceVariationComplement = NULL;
     
     if (genemapStrand == minusstrand) {
-        referenceVariationComplement = malloc(strlen(referenceVariation) + 1);
+        referenceVariationComplement = (char *)malloc(strlen(referenceVariation) + 1);
         strcpy(referenceVariationComplement, complement_nucleotide_sequence(referenceVariation));
         referenceVariation = referenceVariationComplement;
     }
@@ -291,17 +291,17 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         char *genotype1Complement = NULL;
         char *genotype2Complement = NULL;
         if (genemapStrand == minusstrand) {
-            genotype1Complement = malloc(strlen(genotype1) + 1);
+            genotype1Complement = (char *)malloc(strlen(genotype1) + 1);
             strcpy(genotype1Complement, complement_nucleotide_sequence(genotype1));
             genotype1 = genotype1Complement;
-            genotype2Complement = malloc(strlen(genotype2) + 1);
+            genotype2Complement = (char *)malloc(strlen(genotype2) + 1);
             strcpy(genotype2Complement, complement_nucleotide_sequence(genotype2));
             genotype2 = genotype2Complement;
         }
         
         char *concat_genotype = NULL;
         if (bcf_gt_is_phased(genotypeIndex2) == 0) {
-            concat_genotype = malloc(strlen(genotype1) + strlen(genotype2) + 5);
+            concat_genotype = (char *)malloc(strlen(genotype1) + strlen(genotype2) + 5);
             sprintf(concat_genotype, "(%s, %s)", genotype1, genotype2);
             genotype1 = concat_genotype;
             genotype2 = concat_genotype;

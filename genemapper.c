@@ -13,10 +13,10 @@
 
 gene_mapper_t *gene_mapper_init()
 {
-    gene_mapper_t *newGeneMapper = malloc(sizeof(gene_mapper_t));
+    gene_mapper_t *newGeneMapper = (gene_mapper_t *)malloc(sizeof(gene_mapper_t));
     memset(newGeneMapper, 0, sizeof(gene_mapper_t));
     newGeneMapper->exonsAllocated = 2;
-    newGeneMapper->exons = malloc(sizeof(exon_range_t) * 2);
+    newGeneMapper->exons = (exon_range_t *)malloc(sizeof(exon_range_t) * 2);
     memset(newGeneMapper->exons, 0, sizeof(exon_range_t) * 2);
     
     return newGeneMapper;
@@ -24,12 +24,12 @@ gene_mapper_t *gene_mapper_init()
 
 gene_mapper_t *gene_mapper_initWithExons(exon_range_t* exons, int32_t exonCount)
 {
-    gene_mapper_t *newGeneMapper = malloc(sizeof(gene_mapper_t));
+    gene_mapper_t *newGeneMapper = (gene_mapper_t *)malloc(sizeof(gene_mapper_t));
     memset(newGeneMapper, 0, sizeof(gene_mapper_t));
     
     newGeneMapper->exonCount = exonCount;
     newGeneMapper->exonsAllocated = exonCount;
-    newGeneMapper->exons = malloc(sizeof(exon_range_t) * exonCount);
+    newGeneMapper->exons = (exon_range_t *)malloc(sizeof(exon_range_t) * exonCount);
     memcpy(newGeneMapper->exons, exons, sizeof(exon_range_t) * exonCount);
     
     return newGeneMapper;

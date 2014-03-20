@@ -254,7 +254,7 @@ int main(int argc, char * const *argv)
         float headerVersion = 0;
         sscanf(hdrVersionString + strlen(GENEMAP_VERSION_STRING) + 1, "%f", &headerVersion);
         if (headerVersion != GENEMAP_FILE_VERSION) {
-            fprintf(stderr, "This version of Gene Mapper only knows how to handle %2.1f Gene Mapper information.\nThe input file has Gene Mapper %2.1f information", GENEMAP_FILE_VERSION, headerVersion);
+            fprintf(stderr, "This version of Gene Mapper only knows how to handle %2.1f Gene Mapper information.\nThe input file has Gene Mapper %2.1f information.\n", GENEMAP_FILE_VERSION, headerVersion);
             print_usage(stderr, 1);
         }
         
