@@ -445,6 +445,46 @@ char complement_nucleotide(char n)
             return 'n';
         case 'N':
             return 'N';
+        case 'Y':
+            return 'R';
+        case 'y':
+            return 'r';
+        case 'R':
+            return 'Y';
+        case 'r':
+            return 'y';
+        case 'S':
+            return 'S';
+        case 's':
+            return 's';
+        case 'W':
+            return 'W';
+        case 'w':
+            return 'w';
+        case 'K':
+            return 'M';
+        case 'k':
+            return 'm';
+        case 'M':
+            return 'K';
+        case 'm':
+            return 'k';
+        case 'B':
+            return 'V';
+        case 'b':
+            return 'v';
+        case 'V':
+            return 'B';
+        case 'v':
+            return 'b';
+        case 'D':
+            return 'H';
+        case 'd':
+            return 'h';
+        case 'H':
+            return 'd';
+        case 'h':
+            return 'd';
         case '-':
             return '-';
         default:
