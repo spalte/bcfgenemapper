@@ -140,6 +140,18 @@ void csv_formatter_sort_variant_lists(csv_formatter_t* csvFormatter)
     qsort(csvFormatter->variationLists, csvFormatter->variationListsCount, sizeof(csv_formatter_variation_list_t *), compare_variant_lists);
 }
 
+static csv_formatter_variation_list_t *csv_formatter_new_variation_list(csv_formatter_t* csvFormatter, int32_t genemapPosition) {
+    if (csvFormatter->variationListsCount == csvFormatter->variationListsAllocated) {
+        csvFormatter->variationListsAllocated *= 2;
+        csvFormatter->variationLists = (csv_formatter_variation_list_t **)realloc(csvFormatter->variationLists, sizeof(csv_formatter_variation_list_t *) * csvFormatter->variationListsAllocated);
+        memset(csvFormatter->variationLists + csvFormatter->variationListsCount, 0,
+               sizeof(csv_formatter_variation_list_t *) * (csvFormatter->variationListsAllocated - csvFormatter->variationListsCount));
+    }
+    csvFormatter->variationListsCount++;
+    csvFormatter->variationLists[csvFormatter->variationListsCount - 1] = csv_formatter_variation_list_init(csvFormatter->sampleCount + 1, genemapPosition);
+    return csvFormatter->variationLists[csvFormatter->variationListsCount - 1];
+}
+
 void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, bcf1_t *record)
 {
     if (bcf_is_snp(record) == 0) { // only handle SNPs for now
@@ -228,15 +240,7 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         return;
     }
     
-    if (csvFormatter->variationListsCount == csvFormatter->variationListsAllocated) {
-        csvFormatter->variationListsAllocated *= 2;
-        csvFormatter->variationLists = (csv_formatter_variation_list_t **)realloc(csvFormatter->variationLists, sizeof(csv_formatter_variation_list_t *) * csvFormatter->variationListsAllocated);
-        memset(csvFormatter->variationLists + csvFormatter->variationListsCount, 0,
-               sizeof(csv_formatter_variation_list_t *) * (csvFormatter->variationListsAllocated - csvFormatter->variationListsCount));
-    }
-    csvFormatter->variationListsCount++;
-    csvFormatter->variationLists[csvFormatter->variationListsCount - 1] = csv_formatter_variation_list_init(csvFormatter->sampleCount + 1, genemapPosition);
-    csv_formatter_variation_list_t *variationList = csvFormatter->variationLists[csvFormatter->variationListsCount - 1];
+    csv_formatter_variation_list_t *variationList = csv_formatter_new_variation_list(csvFormatter, genemapPosition);
     
     int *genotypesArray = NULL;
     int genotypesCount = 0;
@@ -308,7 +312,7 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
         }
         
         csv_formatter_variation_list_add(variationList, genotype1, (i*2)+1); // +1 because of reference genome
-        csv_formatter_variation_list_add(variationList, genotype2, (i*2)+2); // +1 because of reference genome
+        csv_formatter_variation_list_add(variationList, genotype2, (i*2)+2);
         
         free(concat_genotype);
         free(genotype1Complement);
@@ -318,12 +322,30 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
     free(genotypesArray);
 }
 
+void csv_formatter_add_postition(csv_formatter_t* csvFormatter, int32_t position, const char *referenceSequence)
+{
+    csv_formatter_variation_list_t *variationList = csv_formatter_new_variation_list(csvFormatter, position);
+    
+    size_t sequenceLength = strlen(referenceSequence);
+    if (position >= sequenceLength) {
+        fprintf(stderr, "[%s:%d %s] position %d out of bounds of the reference sequence\n", __FILE__, __LINE__, __FUNCTION__, position);
+        abort();
+    }
+    
+    char *nt = (char *)malloc(sizeof(char) + 1);
+    nt[0] = referenceSequence[position - 1];
+    nt[1] = 0;
+    variationList->variations[0] = nt;
+}
+
 void csv_formatter_print(csv_formatter_t* csvFormatter, FILE *fp)
 {
     int i;
     int j;
     
     csv_formatter_sort_variant_lists(csvFormatter);
+    
+#warning collapse duplicate nucleotides
     
     fprintf(fp, "Sample");
     for (i = 0; i< csvFormatter->variationListsCount; i++) {

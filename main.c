@@ -369,6 +369,13 @@ int main(int argc, char * const *argv)
     }
     
     if (csvFp) {
+        if (geneMapper) {
+            int i;
+            for (i = 0; i < geneMapper->essentialPositionCount; i++) {
+                csv_formatter_add_postition(csvFormatter, geneMapper->essentialPositions[i], geneMapper->referenceGenome);
+            }
+        }
+
         csv_formatter_print(csvFormatter, csvFp);
         fclose(csvFp);
         csvFp = NULL;

@@ -26,6 +26,10 @@ typedef struct {
     int32_t exonCount;
     exon_range_t* exons;
     int32_t exonsAllocated;
+    
+    char* referenceGenome;
+    int32_t* essentialPositions;
+    int32_t essentialPositionCount;
 } gene_mapper_t;
 
 

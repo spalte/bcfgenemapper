@@ -45,6 +45,19 @@ gene_mapper_t *gene_mapper_file_init(FILE *fp)
         gene_mapper_add_exon(newGeneMapper, exon_range(start, end));
     }
     
+    fscanf(fp, "Sequence:\n");
+    
+#warning dynamically allocate array lengths
+    newGeneMapper->referenceGenome = (char *)malloc(2048);
+    newGeneMapper->essentialPositions = (int32_t *)malloc(sizeof(int32_t) * 100);
+    
+    fscanf(fp, "%s\n", newGeneMapper->referenceGenome);
+
+    int position = 0;
+    for (newGeneMapper->essentialPositionCount = 0; fscanf(fp, "%d\n", &position) == 1; newGeneMapper->essentialPositionCount++) {
+        newGeneMapper->essentialPositions[newGeneMapper->essentialPositionCount] = position;
+    }
+    
     return newGeneMapper;
 }
 
@@ -62,6 +75,8 @@ void gene_mapper_add_exon(gene_mapper_t* geneMapper, exon_range_t exon)
 void gene_mapper_destroy(gene_mapper_t* geneMapper)
 {
     free(geneMapper->exons);
+    free(geneMapper->referenceGenome);
+    free(geneMapper->essentialPositions);
     free(geneMapper);
 }
 
