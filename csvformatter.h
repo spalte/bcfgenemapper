@@ -19,6 +19,7 @@ typedef struct {
 
 typedef struct {
     int32_t position;
+    char *sequenceName;;
     
     int32_t variationsCount; // this will be the number of samples
     const char **variations;

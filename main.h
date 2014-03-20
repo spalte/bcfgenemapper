@@ -14,8 +14,16 @@
 #define GENEMAP "GENEMAP"
 #define GENEMAP_INFO_HEADER "##INFO=<ID=" GENEMAP ",Number=1,Type=Integer,Description=\"Mapped Gene Location\">"
 
+#define GENEMAP_NAME GENEMAP "NAME"
+#define GENEMAP_NAME_INFO_HEADER "##INFO=<ID=" GENEMAP_NAME ",Number=1,Type=String,Description=\"Mapped Gene Name\">"
+
 #define GENEMAP_STRAND GENEMAP "STRAND"
 #define GENEMAP_STRAND_INFO_HEADER "##INFO=<ID=" GENEMAP_STRAND ",Number=1,Type=String,Description=\"Mapped Gene Strand\">"
+
+#define GENEMAP_FILE_VERSION 0.1f
+#define GENEMAP_FILE_VERSION_STRING "0.1"
+#define GENEMAP_VERSION_STRING "genemapperVersion"
+#define GENEMAP_VERSION_HEADER "##" GENEMAP_VERSION_STRING "=" GENEMAP_FILE_VERSION_STRING
 
 char complement_nucleotide(char n);
 const char *complement_nucleotide_sequence(const char *sequence);

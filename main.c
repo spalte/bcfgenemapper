@@ -51,6 +51,10 @@ int bcf_update_genemapper_info(const bcf_hdr_t *hdr, bcf1_t *line, int32_t index
     if (error) {
         return error;
     }
+    error = bcf_update_info_string(hdr, line, GENEMAP_NAME, "reference");
+    if (error) {
+        return error;
+    }
     return 0;
 }
 
@@ -63,6 +67,10 @@ int bcf_remove_genemapper_info(const bcf_hdr_t *hdr, bcf1_t *line)
         return error;
     }
     error = bcf_update_info(hdr, line, GENEMAP_STRAND, NULL, 0, BCF_HT_STR);
+    if (error) {
+        return error;
+    }
+    error = bcf_update_info(hdr, line, GENEMAP_NAME, NULL, 0, BCF_HT_STR);
     if (error) {
         return error;
     }
@@ -233,15 +241,26 @@ int main(int argc, char * const *argv)
     }
     
     if (geneMapper == NULL) {
+        char *hdrVersionString = NULL;
         int headerTextLength;
         char *headerText = bcf_hdr_fmt_text(bcf_header, 0, &headerTextLength);
-        if (strstr(headerText, GENEMAP_INFO_HEADER) == NULL || strstr(headerText, GENEMAP_STRAND_INFO_HEADER) == NULL) {
+        if (strstr(headerText, GENEMAP_INFO_HEADER) == NULL ||
+            strstr(headerText, GENEMAP_NAME_INFO_HEADER) == NULL ||
+            strstr(headerText, GENEMAP_STRAND_INFO_HEADER) == NULL ||
+            (hdrVersionString = strstr(headerText, GENEMAP_VERSION_STRING)) == NULL) {
             fprintf(stderr, "The input file '%s' does not have Gene Mapper information. \nPlease provide an exon file with the -e option.\n", input_filename);
             print_usage(stderr, 1);
         }
-
+        float headerVersion = 0;
+        sscanf(hdrVersionString + strlen(GENEMAP_VERSION_STRING) + 1, "%f", &headerVersion);
+        if (headerVersion != GENEMAP_FILE_VERSION) {
+            fprintf(stderr, "This version of Gene Mapper only knows how to handle %2.1f Gene Mapper information.\nThe input file has Gene Mapper %2.1f information", GENEMAP_FILE_VERSION, headerVersion);
+            print_usage(stderr, 1);
+        }
+        
         free(headerText);
     }
+    
     
     char outputFileMode[3] = {'w', 'v', 0};
     if (output_type) {
@@ -271,12 +290,22 @@ int main(int argc, char * const *argv)
 
     bcf_hdr_t *hdr_out = bcf_hdr_dup(bcf_header);
     
-    int error = bcf_hdr_append(hdr_out, GENEMAP_INFO_HEADER);
+    int error = bcf_hdr_append(hdr_out, GENEMAP_VERSION_HEADER);
+    if (error) {
+        fprintf(stderr, "bcf_hdr_append error %d\n", error);
+        abort();
+    }
+    error = bcf_hdr_append(hdr_out, GENEMAP_INFO_HEADER);
     if (error) {
         fprintf(stderr, "bcf_hdr_append error %d\n", error);
         abort();
     }
     error = bcf_hdr_append(hdr_out, GENEMAP_STRAND_INFO_HEADER);
+    if (error) {
+        fprintf(stderr, "bcf_hdr_append error %d\n", error);
+        abort();
+    }
+    error = bcf_hdr_append(hdr_out, GENEMAP_NAME_INFO_HEADER);
     if (error) {
         fprintf(stderr, "bcf_hdr_append error %d\n", error);
         abort();
