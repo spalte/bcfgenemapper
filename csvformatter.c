@@ -384,10 +384,6 @@ void csv_formatter_add_record(csv_formatter_t* csvFormatter, bcf_hdr_t *header, 
 
 void csv_formatter_add_postition(csv_formatter_t* csvFormatter, int32_t position, const char *referenceNuceotide)
 {
-    if (position == 64) {
-        raise(SIGINT);
-    }
-    
     csv_formatter_variation_list_t *variationList = csv_formatter_new_variation_list(csvFormatter, position);
     
     char *nt = (char *)malloc(strlen(referenceNuceotide) + 1);
